@@ -16,10 +16,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
     game_properties = json.loads(msg)
 
     agent = Agent(
-        Map(game_properties["map"]),
-        lambda dir: await websocket.send(
-            json.dumps({"cmd": "key", "key": dir})
-        )
+        Map(game_properties["map"])
     )
 
     while True:
@@ -27,8 +24,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         state = json.loads(
             await websocket.recv()
         )
-        agent.query_move()
-
+        await agent.query_move(websocket)
+        print(state)
       except websockets.exceptions.ConnectionClosedOK:
         print("Server has cleanly disconnected us")
         return
