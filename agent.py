@@ -3,5 +3,5 @@ class Agent:
 
     pass
 
-  def query_dir():
+  def query_dir(self):
     pass
