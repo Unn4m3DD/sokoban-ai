@@ -1,0 +1,33 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "run-user",
+      "type": "shell",
+      "command": "echo running",
+      "dependsOn": [
+        "venv",
+        "server",
+        "viewer",
+        "client"
+      ]
+    },
+    {
+      "label": "server",
+      "type": "shell",
+      "command": "source venv/bin/activate; python3 server.py"
+    },
+    {
+      "label": "viewer",
+      "type": "shell",
+      "command": "source venv/bin/activate; python3 viewer.py"
+    },
+    {
+      "label": "client",
+      "type": "shell",
+      "command": "source venv/bin/activate; python3 client.py"
+    }
+  ]
+}
