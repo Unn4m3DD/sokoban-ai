@@ -23,7 +23,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
             await websocket.recv()
         )
         await agent.query_move(websocket)
-        #print(state)
+        print(state)
       except websockets.exceptions.ConnectionClosedOK:
         print("Server has cleanly disconnected us")
         return
