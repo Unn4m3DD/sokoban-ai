@@ -1,6 +1,9 @@
 import copy
 
 
+count = 0
+
+
 class Game:
 
   def __init__(self, map_content=None):
@@ -20,6 +23,7 @@ class Game:
 
     self.map = list(map(list, zip(*self.map)))
     self.boxes = []
+    self.player = ()
     for x in range(len(self.map)):
       for y in range(len(self.map[x])):
         if(self.map[x][y] in ["@", "+"]):
@@ -27,13 +31,17 @@ class Game:
         if(self.map[x][y] in ["$", "*"]):
           self.boxes.append((x, y))
 
+    print(map_content)
+
   def can_move(self, direction):
-    target = (self.player[0] + direction[0], self.player[1]+direction[1])
+    target = (self.player[0] + direction[0], self.player[1] + direction[1])
     if(self.map[target[0]][target[1]] == "#"):
       return False
 
-    if(self.map[target[0]][target[1]] in ["$", "*"] and self.map[target[0]][target[1]] not in ["$", "*", "#"]):
+    if(self.map[target[0]][target[1]] in ["$", "*"] and
+       self.map[target[0] + direction[0]][target[1] + direction[1]] in ["$", "*", "#"]):
       return False
+
     return True
 
   def _move_player(self, direction):
@@ -43,6 +51,7 @@ class Game:
     self.map[target[0]][target[1]] = "@" if not target_contains_diamond else "+"
     source_contains_diamond = self.map[source[0]][source[1]] == "+"
     self.map[source[0]][source[1]] = "-" if not source_contains_diamond else "."
+    self.player = target
 
   def _move_box(self, source, direction):
     target = (source[0] + direction[0], source[1] + direction[1])
@@ -55,11 +64,10 @@ class Game:
         self.boxes[i] = target
 
   def move(self, direction):
-    target = (self.player[0] + direction[0], self.player[1]+direction[1])
+    target = (self.player[0] + direction[0], self.player[1] + direction[1])
     if(self.map[target[0]][target[1]] in ["$", "*"]):
       self._move_box(target, direction)
     self._move_player(direction)
-    self.player = target
 
   def won(self):
     for box in self.boxes:
@@ -101,10 +109,17 @@ class Game:
     result.map = copy.deepcopy(self.map)
     result.boxes = copy.deepcopy(self.boxes)
     result.player = copy.deepcopy(self.player)
+    global count
+    count += 1
     return result
 
-  def hash_code(self):
-    return hash(tuple([hash(tuple(l)) for l in self.map]))
+  def __eq__(self, other):
+    return self.player == other.player and self.boxes == other.boxes
+
+  def __hash__(self):
+    # hash("".join("".join(i) for i in self.map))
+    # return hash(tuple([hash(tuple(l)) for l in self.map]))
+    return hash(self.player) + hash(tuple(self.boxes))
 
 
 if __name__ == "__main__":
@@ -119,16 +134,19 @@ if __name__ == "__main__":
 
   print(str(game))
   while(True):
-    direction = input("")
-    if direction == "w":
-      direction = (0, -1)
-    elif direction == "a":
-      direction = (-1, 0)
-    elif direction == "s":
-      direction = (0, 1)
-    else:
-      direction = (1, 0)
-
+    first = True
+    direction = (0, 0)
+    while(first or not game.can_move(direction)):
+      direction = input("")
+      if direction == "w":
+        direction = (0, -1)
+      elif direction == "a":
+        direction = (-1, 0)
+      elif direction == "s":
+        direction = (0, 1)
+      else:
+        direction = (1, 0)
+      first = False
     game.move(direction)
     print(game)
     if(game.won()):

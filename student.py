@@ -14,7 +14,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
     msg = await websocket.recv()
     game_properties = json.loads(msg)
     agent = Agent(
-        game_properties["map"]
+        open(game_properties["map"], "r").read()
     )
     while True:
       try:
