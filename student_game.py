@@ -105,6 +105,7 @@ if __name__ == "__main__":
 ####
 """)
 
+  print(str(game))
   while(True):
     direction = input("")
     if direction == "w":
@@ -117,3 +118,10 @@ if __name__ == "__main__":
       direction = (1, 0)
 
     game.move(direction)
+    print(game)
+    if(game.won()):
+      print("won")
+      break
+    if(game.lost()):
+      print("lost")
+      break
