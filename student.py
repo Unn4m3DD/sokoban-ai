@@ -7,7 +7,6 @@ import websockets
 from mapa import Map
 from agent import Agent
 
-
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
   async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
@@ -18,14 +17,13 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
     agent = Agent(
         Map(game_properties["map"])
     )
-
     while True:
       try:
         state = json.loads(
             await websocket.recv()
         )
         await agent.query_move(websocket)
-        print(state)
+        #print(state)
       except websockets.exceptions.ConnectionClosedOK:
         print("Server has cleanly disconnected us")
         return
