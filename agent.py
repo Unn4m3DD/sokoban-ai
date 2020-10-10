@@ -1,14 +1,22 @@
 import math
 import json
 
-from mapa import Map
+from student_game import Game
 
+directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 class Agent:
-  def __init__(self, map, timeout=math.inf):
+
+  def __init__(self, original_map, timeout=math.inf):
     self.current = -1
-    self.map = map
-    self.plays = ["s", "a", "w", "d", "d", "d", "s", "a"]
-    print(map.empty_goals)
+    self.original_game = Game(original_map)
+    self.plays = self._solve(self.original_game)
+
+  def _solve(self, game):
+    available_directions = []
+    for direction in directions:
+      if(game.can_move(direction)):
+        available_directions.append(direction)
+    return []
 
   async def query_move(self, websocket):
     self.current += 1

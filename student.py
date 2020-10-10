@@ -13,9 +13,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
     await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
     msg = await websocket.recv()
     game_properties = json.loads(msg)
-
     agent = Agent(
-        Map(game_properties["map"])
+        game_properties["map"]
     )
     while True:
       try:

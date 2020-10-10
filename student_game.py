@@ -1,9 +1,11 @@
-import consts
+import copy
 
 
 class Game:
 
-  def __init__(self, map_content):
+  def __init__(self, map_content=None):
+    if(map_content == None):
+      return
     self.map = [[j for j in i] for i in map_content.split("\n")][:-1]
     max_length = 0
     for i in self.map:
@@ -93,6 +95,16 @@ class Game:
         res += str(item)
       res += '\n'
     return res
+
+  def clone(self):
+    result = Game()
+    result.map = copy.deepcopy(self.map)
+    result.boxes = copy.deepcopy(self.boxes)
+    result.player = copy.deepcopy(self.player)
+    return result
+
+  def hash_code(self):
+    return hash(tuple([hash(tuple(l)) for l in self.map]))
 
 
 if __name__ == "__main__":
