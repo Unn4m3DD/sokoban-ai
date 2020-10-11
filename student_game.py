@@ -91,7 +91,7 @@ class Game:
 
   def lost(self):
     for box in self.boxes:
-      if(self._trapped(box)):
+      if(self.map[box[0]][box[1]] == "$" and self._trapped(box)):
         return True
     return False
 
@@ -116,23 +116,34 @@ class Game:
   def __eq__(self, other):
     return self.player == other.player and self.boxes == other.boxes
 
+  def __ne__(self, other):
+    return self != other
+
   def __hash__(self):
-    # hash("".join("".join(i) for i in self.map))
+    return hash("".join("".join(i) for i in self.map))
     # return hash(tuple([hash(tuple(l)) for l in self.map]))
-    return hash(self.player) + hash(tuple(self.boxes))
+    #return hash(self.player) + hash(tuple(self.boxes))
 
 
 if __name__ == "__main__":
-  game = Game("""####
-#-.#
+  game = Game("""####--
+#-.#--
+#$-###
+#.@--#
+#-$--#
 #--###
-#*@--#
+####--
+""")
+  game2 = Game("""####--
+#-.#--
+#--###
+#*---#
 #--$-#
-#--###
-####
+#-@###
+####--
 """)
 
-  print(str(game))
+  print(game == game2)
   while(True):
     first = True
     direction = (0, 0)

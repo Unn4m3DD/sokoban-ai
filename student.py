@@ -7,25 +7,25 @@ import websockets
 from mapa import Map
 from agent import Agent
 
+
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
   async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
     await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
-    msg = await websocket.recv()
-    game_properties = json.loads(msg)
-    agent = Agent(
-        open(game_properties["map"], "r").read()
-    )
-    while True:
-      try:
-        state = json.loads(
-            await websocket.recv()
-        )
-        await agent.query_move(websocket)
-        print(state)
-      except websockets.exceptions.ConnectionClosedOK:
-        print("Server has cleanly disconnected us")
-        return
+    await websocket.recv()
+    for i in range(1, 101):
+      agent = Agent(open(f"levels/{i}.xsb").read())
+      queried = agent.query_move()
+      while queried != None:
+        try:
+          print(await websocket.recv())
+          await websocket.send(
+              json.dumps({"cmd": "key", "key": queried})
+          )
+          queried = agent.query_move()
+        except websockets.exceptions.ConnectionClosedOK:
+          print("Server has cleanly disconnected us")
+          return
 
 
 loop = asyncio.get_event_loop()
