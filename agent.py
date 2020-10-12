@@ -3,12 +3,7 @@ import json
 
 from student_game import Game
 
-directions_map = {
-    "s": (0, 1),
-    "d": (1, 0),
-    "w": (0, -1),
-    "a": (-1, 0)
-}
+directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
 
 class Agent:
@@ -17,41 +12,37 @@ class Agent:
     self.current = -1
     self.original_game = Game(original_map)
     self.tested = set()
-    self.plays = self._solve(self.original_game)[1]
+    self.plays = self._solve()
     print(self.plays)
 
-  def _solve(self, game):
-    if(game in self.tested):
-      return False, []
-    self.tested.add(game)
-
-    attempts = self._get_valid_attempts(game)
-
-    for attempt in attempts:
-      attempt[2].move(attempt[1])
-
-      if(attempt[2].won()):
-        return True, [attempt[0]]
-
-      if(attempt[2].lost()):
+  def _solve(self):
+    to_solve = [self.original_game]
+    while(len(to_solve) != 0):
+      poped = to_solve[0]
+      to_solve = to_solve[1:]
+      if(poped in self.tested):
         continue
+      self.tested.add(poped)
+      attempts = self._get_valid_attempts(poped)
+      for attempt in attempts:
+        if(attempt.won()):
+          return attempt.path
 
-    attempts = sorted(attempts, key=lambda x: x[2].score())
-    for attempt in attempts:
-      solution = self._solve(attempt[2])
-      if(solution[0]):
-        return True, [attempt[0]] + solution[1]
+        if(attempt.lost()):
+          continue
+        to_solve.append(attempt)
 
-    return False, []
+      #to_solve.sort(key=lambda x: x.score(), reverse=True)
+    return []
 
   def _get_valid_attempts(self, game):
-    global directions_map
+    global direction
     result = []
-    for direction in directions_map:
-      if(game.can_move(directions_map[direction])):
-        result.append(
-            (direction, directions_map[direction], game.clone())
-        )
+    for direction in directions:
+      if(game.can_move(direction)):
+        inner_game = game.clone()
+        inner_game.move(direction)
+        result.append(inner_game)
     return result
 
   def query_move(self):

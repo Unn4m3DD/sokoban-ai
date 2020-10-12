@@ -33,6 +33,7 @@ class Game:
           self.boxes.append((x, y))
         if(self.map[x][y] in ["+", "*", "."]):
           self.goals.append((x, y))
+    self.path = []
 
   def can_move(self, direction):
     target = (self.player[0] + direction[0], self.player[1] + direction[1])
@@ -64,7 +65,16 @@ class Game:
       if(self.boxes[i] == source):
         self.boxes[i] = target
 
+  def _add_path(self, direction):
+    self.path.append(
+        "s" if (direction == (0, 1)) else
+        "d" if (direction == (1, 0)) else
+        "w" if (direction == (0, -1)) else
+        "a"
+    )
+
   def move(self, direction):
+    self._add_path(direction)
     target = (self.player[0] + direction[0], self.player[1] + direction[1])
     if(self.map[target[0]][target[1]] in ["$", "*"]):
       self._move_box(target, direction)
@@ -103,6 +113,7 @@ class Game:
       for goal in self.goals:
         score += dist(box, goal)
     return score
+
   def __str__(self):
     local_map = list(map(list, zip(*self.map)))
     res = ""
@@ -118,6 +129,7 @@ class Game:
     result.boxes = copy.deepcopy(self.boxes)
     result.player = copy.deepcopy(self.player)
     result.goals = copy.deepcopy(self.goals)
+    result.path = copy.deepcopy(self.path)
     return result
 
   def __eq__(self, other):
