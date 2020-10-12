@@ -10,24 +10,25 @@ from time import sleep
 
 
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
-  async with websockets.connect(f"ws://{server_address}/player") as websocket:
+  async with websockets.connect(f"ws://{server_address}/player", close_timeout=10000) as websocket:
 
     await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
     await websocket.recv()
     for i in range(1, 100):
       agent = Agent(open(f"levels/{i}.xsb").read())
-      queried = agent.query_move()
-      while queried != None:
+      solution = agent.solve(1)
+      while solution == None:
         try:
           print(await websocket.recv())
-          await websocket.send(
-              json.dumps({"cmd": "key", "key": queried})
-          )
-          queried = agent.query_move()
-          sleep(.2)
+          solution = agent.solve(1)
         except websockets.exceptions.ConnectionClosedOK:
           print("Server has cleanly disconnected us")
           return
+      for step in solution:
+        await websocket.send(
+            json.dumps({"cmd": "key", "key": step})
+        )
+        sleep(.2)
 
 
 loop = asyncio.get_event_loop()

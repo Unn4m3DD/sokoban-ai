@@ -1,9 +1,5 @@
 import copy
 
-
-count = 0
-
-
 class Game:
 
   def __init__(self, map_content=None):
@@ -87,16 +83,17 @@ class Game:
     return True
 
   def _trapped(self, box):
-    lost_cond = [
+    lost_condition = [
         (0 + box[0], 1 + box[1]),
         (1 + box[0], 0 + box[1]),
         (0 + box[0], -1 + box[1]),
-        (-1 + box[0], 0 + box[1])
+        (-1 + box[0], 0 + box[1]),
+        (0 + box[0], 1 + box[1])
     ]
 
-    for i, j in zip(range(0, 4), range(-1, 3)):
-      if(self.map[lost_cond[i][0]][lost_cond[i][1]] == "#" and
-         self.map[lost_cond[j][0]][lost_cond[j][1]] == "#"):
+    for i in range(0, 4):
+      if(self.map[lost_condition[i][0]][lost_condition[i][1]] == "#" and
+         self.map[lost_condition[i + 1][0]][lost_condition[i + 1][1]] == "#"):
         return True
     return False
 
@@ -128,7 +125,7 @@ class Game:
     result.map = copy.deepcopy(self.map)
     result.boxes = copy.deepcopy(self.boxes)
     result.player = copy.deepcopy(self.player)
-    result.goals = copy.deepcopy(self.goals)
+    result.goals = self.goals
     result.path = copy.deepcopy(self.path)
     return result
 
