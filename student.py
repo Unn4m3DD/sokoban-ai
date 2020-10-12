@@ -24,6 +24,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         except websockets.exceptions.ConnectionClosedOK:
           print("Server has cleanly disconnected us")
           return
+      if(solution == None):
+        continue
       for step in solution:
         await websocket.send(
             json.dumps({"cmd": "key", "key": step})

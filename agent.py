@@ -18,6 +18,8 @@ class Agent:
     initial_time = time_ns() / 10e9
     elapsed_time = 0
     while(len(self.to_solve) != 0 and elapsed_time < timeout):
+      elapsed_time =  (time_ns() / 10e9) - initial_time
+      print(elapsed_time)
       popped = self.to_solve[0]
       self.to_solve = self.to_solve[1:]
       if(popped in self.tested):
@@ -33,8 +35,7 @@ class Agent:
         self.to_solve.append(attempt)
 
       self.to_solve.sort(key=lambda x: x.score(), reverse=False)
-      elapsed_time = initial_time - time_ns() / 10e9
-    return []
+    return None
 
   def _get_valid_attempts(self, game):
     global directions
