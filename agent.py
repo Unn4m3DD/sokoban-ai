@@ -37,9 +37,9 @@ class Agent:
       self.to_solve.sort(key=lambda x: x.cost(), reverse=False)
       new_best_score = self.to_solve[0].cost()
       if(new_best_score < self.best_score):
-        self.best_score = new_best_score
-        print(self.best_score)
+        print(new_best_score)
         print(self.to_solve[0])
+        self.best_score = new_best_score
     return None
 
   def _get_valid_attempts(self, game):

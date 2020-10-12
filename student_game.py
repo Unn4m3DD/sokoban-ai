@@ -1,6 +1,7 @@
 import copy
 from math import sqrt
 
+
 class Game:
 
   def __init__(self, map_content=None):
@@ -11,12 +12,6 @@ class Game:
     for i in self.map:
       if len(i) > max_length:
         max_length = len(i)
-
-    for i in range(len(self.map)):
-      j = len(self.map[i])
-      while(j < max_length):
-        self.map[i].append("-")
-        j += 1
 
     self.map = list(map(list, zip(*self.map)))
     self.boxes = []
@@ -34,7 +29,28 @@ class Game:
       for y in range(len(self.map[x])):
         if self.map[x][y] in [".", "$", "*", "@", "+"]:
           self.map[x][y] = "-"
+    self._bfs_available_positions()
     self.path = []
+
+  def _bfs_available_positions(self):
+    visited = set()
+    queue = [self.player]
+    while(len(queue) != 0):
+      item = queue[0]
+      queue = queue[1:]
+      if(item in visited):
+        continue
+      visited.add(item)
+      for i in ((0, 1), (1, 0), (0, -1), (-1, 0)):
+        pos = (item[0] + i[0], item[1] + i[1])
+        if(self.map[pos[0]][pos[1]] != "#"):
+          queue.append(pos)
+    for i in range(len(self.map)):
+      for j in range(len(self.map[i])):
+        self.map[i][j] = "#"
+
+    for pos in visited:
+      self.map[pos[0]][pos[1]] = "-"
 
   def can_move(self, direction):
     target = (self.player[0] + direction[0], self.player[1] + direction[1])
@@ -92,20 +108,80 @@ class Game:
         return True
     return False
 
+  def _cant_go_diamond_direction_horizontal(self, box):
+    horizontal_match = False
+    for goal in self.goals:
+      if(goal[1] == box[1]):
+        horizontal_match = True
+
+    if(not horizontal_match):
+      horizontally_trapped = True
+      for x in range(len(self.map)):
+        for y in range(box[1]):
+          if(self.map[x][y] != "#"):
+            horizontally_trapped = False
+            break
+      if(horizontally_trapped):
+        return True
+
+      horizontally_trapped = True
+      for x in range(len(self.map)):
+        for y in range(box[1] + 1, len(self.map[box[0]])):
+          if(self.map[x][y] != "#"):
+            horizontally_trapped = False
+            break
+      if(horizontally_trapped):
+        return True
+    return False
+
+  def _cant_go_diamond_direction_vertical(self, box):
+    vertical_match = False
+    for goal in self.goals:
+      if(goal[0] == box[0]):
+        vertical_match = True
+
+    if(not vertical_match):
+      vertically_trapped = True
+      for x in range(box[0]):
+        for y in range(len(self.map[box[0]])):
+          if(self.map[x][y] != "#"):
+            vertically_trapped = False
+            break
+      if(vertically_trapped):
+        return True
+
+      vertically_trapped = True
+      for x in range(box[0] + 1, len(self.map)):
+        for y in range(len(self.map[box[0]])):
+          if(self.map[x][y] != "#"):
+            vertically_trapped = False
+            break
+      if(vertically_trapped):
+        return True
+    return False
+
+  def _cant_go_diamond_direction(self, box):
+    if(self._cant_go_diamond_direction_horizontal(box)):
+      return True
+    if(self._cant_go_diamond_direction_vertical(box)):
+      return True
+    return False
+
   def lost(self):
     for box in self.boxes:
       if(box not in self.goals and self._trapped(box)):
         return True
+      if(self._cant_go_diamond_direction(box)):
+        return True
+
     return False
 
   def cost(self):
     def dist(p1, p2): return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
-    score = 0
-    for box in self.boxes:
-      for goal in self.goals:
-        score += dist(box, goal)
-      score += dist(box, self.player)
-    return score
+    cost = 0
+    for box, goal in zip(self.boxes, self.goals):
+      cost += dist(box, goal)
+    return cost
 
   def __str__(self):
     local_map = list(self.map)
