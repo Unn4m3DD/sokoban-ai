@@ -13,13 +13,13 @@ class Agent:
     self.original_game = Game(original_map)
     self.tested = set()
     self.to_solve = [self.original_game]
+    self.best_score = float("inf")
 
   def solve(self, timeout):
-    initial_time = time_ns() / 10e9
+    initial_time = time_ns() / 10e6
     elapsed_time = 0
     while(len(self.to_solve) != 0 and elapsed_time < timeout):
-      elapsed_time =  (time_ns() / 10e9) - initial_time
-      print(elapsed_time)
+      elapsed_time = (time_ns() / 10e6) - initial_time
       popped = self.to_solve[0]
       self.to_solve = self.to_solve[1:]
       if(popped in self.tested):
@@ -34,7 +34,12 @@ class Agent:
           continue
         self.to_solve.append(attempt)
 
-      self.to_solve.sort(key=lambda x: x.score(), reverse=False)
+      self.to_solve.sort(key=lambda x: x.cost(), reverse=False)
+      new_best_score = self.to_solve[0].cost()
+      if(new_best_score < self.best_score):
+        self.best_score = new_best_score
+        print(self.best_score)
+        print(self.to_solve[0])
     return None
 
   def _get_valid_attempts(self, game):
@@ -46,4 +51,3 @@ class Agent:
         inner_game.move(direction)
         result.append(inner_game)
     return result
-

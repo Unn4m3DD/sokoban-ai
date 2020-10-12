@@ -19,7 +19,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
       solution = agent.solve(1)
       while solution == None:
         try:
-          print(await websocket.recv())
+          await websocket.recv()
           solution = agent.solve(1)
         except websockets.exceptions.ConnectionClosedOK:
           print("Server has cleanly disconnected us")

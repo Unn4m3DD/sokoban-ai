@@ -1,0 +1,1 @@
+instead of recording a path, record events like box pushes and recreate them using A* so that the path used is the shortest
