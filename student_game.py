@@ -23,6 +23,7 @@ class Game:
 
     self.map = list(map(list, zip(*self.map)))
     self.boxes = []
+    self.goals = []
     self.player = ()
     for x in range(len(self.map)):
       for y in range(len(self.map[x])):
@@ -30,8 +31,8 @@ class Game:
           self.player = (x, y)
         if(self.map[x][y] in ["$", "*"]):
           self.boxes.append((x, y))
-
-    print(map_content)
+        if(self.map[x][y] in ["+", "*", "."]):
+          self.goals.append((x, y))
 
   def can_move(self, direction):
     target = (self.player[0] + direction[0], self.player[1] + direction[1])
@@ -95,6 +96,13 @@ class Game:
         return True
     return False
 
+  def score(self):
+    def dist(p1, p2): return (p1[0] * p2[0])**2 + (p1[1] * p2[1])**2
+    score = 0
+    for box in self.boxes:
+      for goal in self.goals:
+        score += dist(box, goal)
+    return score
   def __str__(self):
     local_map = list(map(list, zip(*self.map)))
     res = ""
@@ -109,8 +117,7 @@ class Game:
     result.map = copy.deepcopy(self.map)
     result.boxes = copy.deepcopy(self.boxes)
     result.player = copy.deepcopy(self.player)
-    global count
-    count += 1
+    result.goals = copy.deepcopy(self.goals)
     return result
 
   def __eq__(self, other):
@@ -122,7 +129,7 @@ class Game:
   def __hash__(self):
     return hash("".join("".join(i) for i in self.map))
     # return hash(tuple([hash(tuple(l)) for l in self.map]))
-    #return hash(self.player) + hash(tuple(self.boxes))
+    # return hash(self.player) + hash(tuple(self.boxes))
 
 
 if __name__ == "__main__":
@@ -134,16 +141,7 @@ if __name__ == "__main__":
 #--###
 ####--
 """)
-  game2 = Game("""####--
-#-.#--
-#--###
-#*---#
-#--$-#
-#-@###
-####--
-""")
 
-  print(game == game2)
   while(True):
     first = True
     direction = (0, 0)
@@ -160,9 +158,9 @@ if __name__ == "__main__":
       first = False
     game.move(direction)
     print(game)
-    if(game.won()):
-      print("won")
-      break
     if(game.lost()):
       print("lost")
+      break
+    if(game.won()):
+      print("won")
       break

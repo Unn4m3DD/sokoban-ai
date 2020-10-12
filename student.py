@@ -6,6 +6,7 @@ import os
 import websockets
 from mapa import Map
 from agent import Agent
+from time import sleep
 
 
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
@@ -13,7 +14,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
     await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
     await websocket.recv()
-    for i in range(1, 101):
+    for i in range(1, 100):
       agent = Agent(open(f"levels/{i}.xsb").read())
       queried = agent.query_move()
       while queried != None:
@@ -23,6 +24,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
               json.dumps({"cmd": "key", "key": queried})
           )
           queried = agent.query_move()
+          sleep(.2)
         except websockets.exceptions.ConnectionClosedOK:
           print("Server has cleanly disconnected us")
           return

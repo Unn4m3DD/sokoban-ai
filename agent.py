@@ -21,38 +21,38 @@ class Agent:
     print(self.plays)
 
   def _solve(self, game):
-    global directions_map
     if(game in self.tested):
       return False, []
-
     self.tested.add(game)
-    valid_moves = []
-    for direction in directions_map:
-      if(game.can_move(directions_map[direction])):
-        valid_moves.append((direction, directions_map[direction]))
-    games = []
 
-    for _ in range(len(valid_moves)):
-      games.append(game.clone())
+    attempts = self._get_valid_attempts(game)
 
-    for i in range(len(valid_moves)):
-      # if(game.map[1][2] == "$" and game.map[2][4] == "$" and game.map[2][3] == "@" and valid_moves[i][0] == "a"):
-      #  print("1\n",games[i])
-      #  games[i].move(valid_moves[i][1])
-      #  print("2\n", games[i])
-      # else:
-      games[i].move(valid_moves[i][1])
+    for attempt in attempts:
+      attempt[2].move(attempt[1])
 
-      if(games[i].won()):
-        return True, [valid_moves[i][0]]
-      # if(games[i].lost()):
-      #  return False, []
+      if(attempt[2].won()):
+        return True, [attempt[0]]
 
-      solution = self._solve(games[i])
+      if(attempt[2].lost()):
+        continue
+
+    attempts = sorted(attempts, key=lambda x: x[2].score())
+    for attempt in attempts:
+      solution = self._solve(attempt[2])
       if(solution[0]):
-        return True, [valid_moves[i][0]] + solution[1]
+        return True, [attempt[0]] + solution[1]
 
     return False, []
+
+  def _get_valid_attempts(self, game):
+    global directions_map
+    result = []
+    for direction in directions_map:
+      if(game.can_move(directions_map[direction])):
+        result.append(
+            (direction, directions_map[direction], game.clone())
+        )
+    return result
 
   def query_move(self):
     self.current += 1
