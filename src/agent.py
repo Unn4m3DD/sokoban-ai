@@ -1,7 +1,7 @@
 import math
 import json
 from time import time_ns
-from student_game import Game
+from game import Game
 
 directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
