@@ -1,1 +1,2 @@
 instead of recording a path, record events like box pushes and recreate them using A* so that the path used is the shortest
+create a set of places where boxes cant be or otherwise are trapped and check against it, add it to can_move instead of appendig it to the big to_solve list
