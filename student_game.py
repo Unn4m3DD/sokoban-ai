@@ -12,6 +12,11 @@ class Game:
     for i in self.map:
       if len(i) > max_length:
         max_length = len(i)
+    for i in range(len(self.map)):
+      j = len(self.map[i])
+      while(j < max_length):
+        self.map[i].append("#")
+        j += 1
 
     self.map = list(map(list, zip(*self.map)))
     self.boxes = []
@@ -179,8 +184,13 @@ class Game:
   def cost(self):
     def dist(p1, p2): return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
     cost = 0
-    for box, goal in zip(self.boxes, self.goals):
-      cost += dist(box, goal)
+    for box in self.boxes:
+      for goal in self.goals:
+        cost += dist(box, goal)
+        if(dist(box, goal) == 0):
+          cost -= 25
+      if(dist(box, self.player) == 1):
+        cost -= 20
     return cost
 
   def __str__(self):

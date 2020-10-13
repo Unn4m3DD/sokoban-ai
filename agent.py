@@ -8,7 +8,7 @@ directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
 class Agent:
 
-  def __init__(self, original_map, timeout=math.inf):
+  def __init__(self, original_map):
     self.current = -1
     self.original_game = Game(original_map)
     self.tested = set()
