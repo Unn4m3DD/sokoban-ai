@@ -17,6 +17,6 @@ open 3 terminals:
 
 `$ python3 server/viewer.py`
 
-`$ python3 src/student.py`
+`$ python3 src/client.py`
 
 to play using the sample client make sure the client pygame hidden window has focus
