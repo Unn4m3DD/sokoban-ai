@@ -12,7 +12,7 @@ class Agent:
     self.current = -1
     self.original_game = Game(original_map)
     self.tested = set()
-    self.to_solve = [self.original_game]
+    self.to_solve = [(self.original_game, self.original_game.cost())]
     self.best_score = float("inf")
 
   def solve(self, timeout):
@@ -20,25 +20,29 @@ class Agent:
     elapsed_time = 0
     while(len(self.to_solve) != 0 and elapsed_time < timeout):
       elapsed_time = (time_ns() / 10e6) - initial_time
-      popped = self.to_solve[0]
-      self.to_solve = self.to_solve[1:]
-      if(popped in self.tested):
+      popped = self.to_solve.pop()
+      if(popped[0] in self.tested):
         continue
-      self.tested.add(popped)
-      attempts = self._get_valid_attempts(popped)
+      self.tested.add(popped[0])
+      attempts = self._get_valid_attempts(popped[0])
       for attempt in attempts:
         if(attempt.won()):
           return attempt.path
 
         if(attempt.lost()):
           continue
-        self.to_solve.append(attempt)
+        cost = attempt.cost()
+        i = 0
+        while(i < len(self.to_solve) and self.to_solve[i][1] < cost):
+          i += 1
 
-      self.to_solve.sort(key=lambda x: x.cost(), reverse=False)
-      new_best_score = self.to_solve[0].cost()
+        self.to_solve.insert(i, (attempt, cost))
+
+      
+      new_best_score = self.to_solve[0][1]
       if(new_best_score < self.best_score):
         print(new_best_score)
-        print(self.to_solve[0])
+        print(self.to_solve[0][0])
         self.best_score = new_best_score
     return None
 
