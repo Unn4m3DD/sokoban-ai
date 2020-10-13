@@ -8,21 +8,19 @@
       "type": "shell",
       "command": "echo running",
       "dependsOn": [
+        "server",
         "viewer"
       ]
     },
     {
       "label": "server",
       "type": "shell",
-      "command": "source venv/bin/activate; python3 server.py"
+      "command": "source venv/bin/activate; python3 server/server.py"
     },
     {
       "label": "viewer",
       "type": "shell",
-      "command": "source venv/bin/activate; python3 viewer.py",
-      "dependsOn": [
-        "server"
-      ]
+      "command": "source venv/bin/activate; python3 server/viewer.py",
     }
   ]
 }

@@ -1,0 +1,11 @@
+{
+  "files.exclude": {
+    "levels/": true,
+    "data/": true,
+    "venv/": true,
+    ".gitignore": true,
+    "LICENSE": true,
+    "highscores.json": true,
+    "**/__pycache__/": true,
+  }
+}
