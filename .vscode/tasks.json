@@ -20,7 +20,7 @@
     {
       "label": "viewer",
       "type": "shell",
-      "command": "source venv/bin/activate; python3 server/viewer.py --level 36",
+      "command": "source venv/bin/activate; python3 server/viewer.py",
     }
   ]
 }
