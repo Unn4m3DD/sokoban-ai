@@ -7,19 +7,19 @@ import websockets
 from agent import Agent
 from time import sleep
 
-
+# falhou 36, 76, 77, 
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
   async with websockets.connect(f"ws://{server_address}/player", close_timeout=10000) as websocket:
 
     await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
     await websocket.recv()
-    for i in range(37, 100):
+    for i in range(1, 156):
       agent = Agent(open(f"levels/{i}.xsb").read())
       solution = agent.solve(1)
       while solution == None:
         try:
           await websocket.recv()
-          solution = agent.solve(1)
+          solution = agent.solve(1000)
         except websockets.exceptions.ConnectionClosedOK:
           print("Server has cleanly disconnected us")
           return

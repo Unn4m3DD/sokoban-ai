@@ -11,7 +11,7 @@ import websockets
 import pygame
 from consts import RANKS, Tiles
 from mapa import Map
-from game import reduce_score
+from server_game import reduce_score
 
 logging.basicConfig(level=logging.DEBUG)
 logger_websockets = logging.getLogger("websockets")

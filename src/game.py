@@ -2,6 +2,7 @@ import copy
 from math import sqrt
 
 
+
 class Game:
 
   def __init__(self, map_content=None):
