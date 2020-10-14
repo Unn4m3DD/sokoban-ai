@@ -15,11 +15,10 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
     await websocket.recv()
     for i in range(1, 156):
       agent = Agent(open(f"levels/{i}.xsb").read())
-      solution = agent.solve(1)
       while solution == None:
         try:
           await websocket.recv()
-          solution = agent.solve(1000)
+          solution = agent.solve(5)
         except websockets.exceptions.ConnectionClosedOK:
           print("Server has cleanly disconnected us")
           return

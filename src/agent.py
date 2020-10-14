@@ -1,6 +1,6 @@
 import math
 import json
-from time import time_ns
+from time import time
 from game import Game
 
 directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
@@ -16,10 +16,10 @@ class Agent:
     self.best_score = float("inf")
 
   def solve(self, timeout):
-    initial_time = time_ns() / 10e6
+    initial_time = time()
     elapsed_time = 0
     while(len(self.to_solve) != 0 and elapsed_time < timeout):
-      elapsed_time = (time_ns() / 10e6) - initial_time
+      elapsed_time = (time()) - initial_time
       popped = self.to_solve.pop()
       if(popped[0] in self.tested):
         continue
@@ -36,7 +36,6 @@ class Agent:
 
         self.to_solve.insert(i, (attempt, cost))
 
-      
       new_best_score = self.to_solve[0][1]
       if(new_best_score < self.best_score):
         print(new_best_score)
