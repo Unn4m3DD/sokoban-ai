@@ -15,6 +15,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
     await websocket.recv()
     for i in range(1, 156):
       agent = Agent(open(f"levels/{i}.xsb").read())
+      solution = None
       while solution == None:
         try:
           await websocket.recv()
