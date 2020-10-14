@@ -13,7 +13,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
     await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
     await websocket.recv()
-    for i in range(1, 100):
+    for i in range(36, 100):
       agent = Agent(open(f"levels/{i}.xsb").read())
       solution = agent.solve(1)
       while solution == None:

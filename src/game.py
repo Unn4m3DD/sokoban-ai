@@ -35,7 +35,26 @@ class Game:
         if self.map[x][y] in [".", "$", "*", "@", "+"]:
           self.map[x][y] = "-"
     self._bfs_available_positions()
+    self.deadlocks = self._search_deadlocks()
+    for goal in self.goals:
+      if(goal in self.deadlocks):
+        self.deadlocks.remove(goal)
     self.path = []
+
+  def _search_deadlocks(self):
+    deadlocks = set()
+    for x in range(1, len(self.map) - 1):
+      for y in range(1, len(self.map[x]) - 1):
+        if(self.map[x][y] == "#"):
+          continue
+        position = (x, y)
+        if(position not in self.goals and self._trapped(position)):
+          deadlocks.add(position)
+          continue
+        if(self._cant_go_diamond_direction(position)):
+          deadlocks.add(position)
+          continue
+    return deadlocks
 
   def _bfs_available_positions(self):
     visited = set()
@@ -63,7 +82,11 @@ class Game:
       return False
 
     box_target = (target[0] + direction[0], target[1] + direction[1])
-    if(target in self.boxes and (box_target in self.boxes or self.map[box_target[0]][box_target[1]] == "#")):
+    if(target in self.boxes and
+       (box_target in self.boxes or
+            self.map[box_target[0]][box_target[1]] == "#" or
+            box_target in self.deadlocks)
+       ):
       return False
 
     return True
@@ -172,25 +195,17 @@ class Game:
       return True
     return False
 
-  def lost(self):
-    for box in self.boxes:
-      if(box not in self.goals and self._trapped(box)):
-        return True
-      if(self._cant_go_diamond_direction(box)):
-        return True
-
-    return False
-
   def cost(self):
     def dist(p1, p2): return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
     cost = 0
-    for box in self.boxes:
+    first_box = True
+    not_in_goal_boxes = [i for i in self.boxes if i not in self.goals]
+    for box in not_in_goal_boxes:
       for goal in self.goals:
         cost += dist(box, goal)
-        if(dist(box, goal) == 0):
-          cost -= 25
-      if(dist(box, self.player) == 1):
+      if(first_box and dist(box, self.player) == 1):
         cost -= 20
+    cost -= 50 * (len(self.boxes) - len(not_in_goal_boxes))
     return cost
 
   def __str__(self):
@@ -211,6 +226,12 @@ class Game:
         tmp[goal[1]] = "."
         local_map[goal[0]] = "".join(tmp)
 
+    for deadlock in self.deadlocks:
+      if(deadlock not in self.boxes and deadlock != self.player):
+        tmp = list(local_map[deadlock[0]])
+        tmp[deadlock[1]] = "X"
+        local_map[deadlock[0]] = "".join(tmp)
+
     tmp = list(local_map[self.player[0]])
     tmp[self.player[1]] = "@" if self.player not in self.goals else "+"
     local_map[self.player[0]] = "".join(tmp)
@@ -228,6 +249,7 @@ class Game:
     result.boxes = copy.deepcopy(self.boxes)
     result.player = copy.deepcopy(self.player)
     result.goals = self.goals
+    result.deadlocks = self.deadlocks
     result.path = copy.deepcopy(self.path)
     return result
 

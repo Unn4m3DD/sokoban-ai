@@ -29,11 +29,9 @@ class Agent:
         if(attempt.won()):
           return attempt.path
 
-        if(attempt.lost()):
-          continue
         cost = attempt.cost()
         i = 0
-        while(i < len(self.to_solve) and self.to_solve[i][1] < cost):
+        while(i < len(self.to_solve) and self.to_solve[i][1] > cost):
           i += 1
 
         self.to_solve.insert(i, (attempt, cost))
