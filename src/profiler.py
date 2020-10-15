@@ -27,7 +27,7 @@ except:
       "max steps": 99999,
       "min steps": 99999
   }
-for i in range(len(last_attempt), 35):
+for i in range(len(last_attempt), 156):
   last_attempt.append(((99999), (9999)))
 
 current_attempt = [None]
