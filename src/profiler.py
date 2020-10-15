@@ -32,7 +32,7 @@ for i in range(len(last_attempt), 35):
 
 current_attempt = [None]
 
-for i in range(1, 35):
+for i in range(1, 156):
   start_time = time()
   _original_stdout = sys.stdout
   sys.stdout = open(os.devnull, 'w')
@@ -66,12 +66,12 @@ info = {
     "avg steps": int(sum(stepss)/len(stepss)),
     "max steps": max(stepss),
     "min steps": min(stepss),
-    "diff beaten": last_attempt_info["beaten"] - len(beaten),
-    "diff avg time[ms]": last_attempt_info["avg time[ms]"] - int(sum(times)/len(times)),
-    "diff max time[ms]": last_attempt_info["max time[ms]"] - max(times),
-    "diff min time[ms]": last_attempt_info["min time[ms]"] - min(times),
-    "diff avg steps": last_attempt_info["avg steps"] - int(sum(stepss)/len(stepss)),
-    "diff max steps": last_attempt_info["max steps"] - max(stepss),
-    "diff min steps": last_attempt_info["min steps"] - min(stepss),
+    "diff beaten": len(beaten) - last_attempt_info["beaten"],
+    "diff avg time[ms]":  int(sum(times)/len(times)) - last_attempt_info["avg time[ms]"],
+    "diff max time[ms]":  max(times) - last_attempt_info["max time[ms]"],
+    "diff min time[ms]":  min(times) - last_attempt_info["min time[ms]"],
+    "diff avg steps": int(sum(stepss)/len(stepss)) - last_attempt_info["avg steps"],
+    "diff max steps": max(stepss) - last_attempt_info["max steps"],
+    "diff min steps": min(stepss) - last_attempt_info["min steps"],
 }
 print(json.dumps(info))
