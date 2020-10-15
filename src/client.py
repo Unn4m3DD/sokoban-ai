@@ -12,7 +12,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
     await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
     await websocket.recv()
-    for i in range(36, 156):
+    for i in range(60, 156):
       agent = Agent(open(f"levels/{i}.xsb").read())
       solution = None
       while solution == None:
@@ -30,13 +30,17 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
           await websocket.send(
               json.dumps({"cmd": "key", "key": key})
           )
-          sleep(.2)
+          #
+          # sleep(.2)
         except Exception as e:
           print(e)
 
+def main():
+  loop = asyncio.get_event_loop()
+  SERVER = os.environ.get("SERVER", "localhost")
+  PORT = os.environ.get("PORT", "8000")
+  NAME = "93357"
+  loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
 
-loop = asyncio.get_event_loop()
-SERVER = os.environ.get("SERVER", "localhost")
-PORT = os.environ.get("PORT", "8000")
-NAME = os.environ.get("NAME", getpass.getuser())
-loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
+if __name__ == "__main__":
+  main()

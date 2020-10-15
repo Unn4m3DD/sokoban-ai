@@ -220,14 +220,15 @@ class Game:
     return False
 
   def cost(self):
-    def dist(p1, p2): return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+    def dist(p1, p2): return p1[0] - p2[0] + p1[1] - p2[1]
     cost = 0
-    first_box = True
     not_in_goal_boxes = [i for i in self.boxes if i not in self.goals]
-    #for box in not_in_goal_boxes:
-    #  for goal in self.goals:
-    #    cost += dist(box, goal)
-    cost -= 50 * (len(self.boxes) - len(not_in_goal_boxes))
+    for box in not_in_goal_boxes:
+      for goal in self.goals:
+        cost += dist(box, goal)
+    cost = 2 ** cost
+    cost = 0
+    cost -= 300 * (len(self.boxes) - len(not_in_goal_boxes))
     return cost
 
   def __str__(self):
