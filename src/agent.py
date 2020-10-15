@@ -36,19 +36,12 @@ class Agent:
 
         self.to_solve.insert(i, (attempt, cost))
 
-      new_best_score = self.to_solve[0][1]
-      if(new_best_score < self.best_score):
-        print(new_best_score)
-        print(self.to_solve[0][0])
-        self.best_score = new_best_score
     return None
 
   def _get_valid_attempts(self, game):
-    global directions
     result = []
-    for direction in directions:
-      if(game.can_move(direction)):
-        inner_game = game.clone()
-        inner_game.move(direction)
-        result.append(inner_game)
+    for event in game.available_events():
+      inner_game = game.clone()
+      inner_game.perform_event(event)
+      result.append(inner_game)
     return result

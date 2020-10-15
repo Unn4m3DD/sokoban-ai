@@ -2,6 +2,11 @@ import copy
 from math import sqrt
 
 
+directions = {"s": (0, 1),
+              "d": (1, 0),
+              "w": (0, -1),
+              "a": (-1, 0)}
+
 
 class Game:
 
@@ -77,8 +82,10 @@ class Game:
     for pos in visited:
       self.map[pos[0]][pos[1]] = "-"
 
-  def can_move(self, direction):
-    target = (self.player[0] + direction[0], self.player[1] + direction[1])
+  def can_move(self, direction, source=None):
+    if(source == None):
+      source = self.player
+    target = (source[0] + direction[0], source[1] + direction[1])
     if(self.map[target[0]][target[1]] == "#"):
       return False
 
@@ -101,20 +108,36 @@ class Game:
     target = (source[0] + direction[0], source[1] + direction[1])
     self.boxes[self.boxes.index(source)] = target
 
-  def _add_path(self, direction):
-    self.path.append(
-        "s" if (direction == (0, 1)) else
-        "d" if (direction == (1, 0)) else
-        "w" if (direction == (0, -1)) else
-        "a"
-    )
-
-  def move(self, direction):
-    self._add_path(direction)
+  def move(self, direction_char):
+    global directions
+    self.path.append(direction_char)
+    direction = directions[direction_char]
     target = (self.player[0] + direction[0], self.player[1] + direction[1])
     if(target in self.boxes):
       self._move_box(target, direction)
     self._move_player(direction)
+
+  def available_events(self):
+    result = []
+    visited = set()
+    queue = [(self.player, [])]
+    while(len(queue) != 0):
+      item = queue[0]
+      queue = queue[1:]
+      if(item[0] in visited):
+        continue
+      visited.add(item[0])
+      for char, direction in (("s", (0, 1)), ("d", (1, 0)), ("w", (0, -1)), ("a", (-1, 0))):
+        pos = (item[0][0] + direction[0], item[0][1] + direction[1])
+        if(self.map[pos[0]][pos[1]] != "#" and pos not in self.boxes):
+          queue.append((pos, item[1] + [char]))
+        elif(pos in self.boxes and self.can_move(direction, (pos[0] - direction[0], pos[1] - direction[1]))):
+          result.append(item[1] + [char])
+    return result
+
+  def perform_event(self, event):
+    for action in event:
+      self.move(action)
 
   def won(self):
     for box in self.boxes:
@@ -201,11 +224,9 @@ class Game:
     cost = 0
     first_box = True
     not_in_goal_boxes = [i for i in self.boxes if i not in self.goals]
-    for box in not_in_goal_boxes:
-      for goal in self.goals:
-        cost += dist(box, goal)
-      if(first_box and dist(box, self.player) == 1):
-        cost -= 20
+    #for box in not_in_goal_boxes:
+    #  for goal in self.goals:
+    #    cost += dist(box, goal)
     cost -= 50 * (len(self.boxes) - len(not_in_goal_boxes))
     return cost
 
@@ -275,21 +296,13 @@ if __name__ == "__main__":
 #--###
 ####
 """)
+  print(game.available_events())
   print(game)
   while(True):
     first = True
-    direction = (0, 0)
-    while(first or not game.can_move(direction)):
+    direction = input("")
+    while(not game.can_move(direction)):
       direction = input("")
-      if direction == "w":
-        direction = (0, -1)
-      elif direction == "a":
-        direction = (-1, 0)
-      elif direction == "s":
-        direction = (0, 1)
-      elif direction == "d":
-        direction = (1, 0)
-      first = False
     game.move(direction)
     print(game)
     if(game.lost()):
