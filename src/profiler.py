@@ -32,7 +32,7 @@ for i in range(len(last_attempt), 35):
 
 current_attempt = [None]
 
-for i in range(1, 35):
+for i in range(1, 156):
   start_time = time()
   _original_stdout = sys.stdout
   sys.stdout = open(os.devnull, 'w')
