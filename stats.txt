@@ -1,16 +1,156 @@
-level 1  - duration[ms]       29 (   -99970):  steps     33( -9966)
-level 2  - duration[ms]        9 (   -99990):  steps     16( -9983)
-level 3  - duration[ms]      111 (   -99888):  steps     41( -9958)
-level 4  - duration[ms]      112 (   -99887):  steps     31( -9968)
-level 5  - duration[ms]      403 (   -99596):  steps     45( -9954)
-level 6  - duration[ms]     2313 (   -97686):  steps    111( -9888)
-level 7  - duration[ms]      983 (   -99016):  steps     44( -9955)
-level 8  - duration[ms]      293 (   -99706):  steps    113( -9886)
-level 9  - duration[ms]       17 (   -99982):  steps     30( -9969)
-level 10 - duration[ms]      399 (   -99600):  steps     91( -9908)
-level 11 - duration[ms]      229 (   -99770):  steps     80( -9919)
-level 12 - duration[ms]       24 (   -99975):  steps     49( -9950)
-level 13 - duration[ms]      505 (   -99494):  steps     63( -9936)
-level 14 - duration[ms]       29 (   -99970):  steps     51( -9948)
-level 15 - duration[ms]       47 (   -99952):  steps     43( -9956)
-{"beaten": 15, "avg time[ms]": 366, "max time[ms]": 2313, "min time[ms]": 9, "avg steps": 56, "max steps": 113, "min steps": 16, "diff beaten": 15, "diff avg time[ms]": -99633, "diff max time[ms]": -97686, "diff min time[ms]": -99990, "diff avg steps": -99943, "diff max steps": -99886, "diff min steps": -99983}
+level 1  - duration[ms]       29 (        0):  steps     33(     0)
+level 2  - duration[ms]        8 (       -1):  steps     16(     0)
+level 3  - duration[ms]      113 (        2):  steps     41(     0)
+level 4  - duration[ms]      113 (        1):  steps     31(     0)
+level 5  - duration[ms]      415 (       12):  steps     45(     0)
+level 6  - duration[ms]     2353 (       40):  steps    111(     0)
+level 7  - duration[ms]      983 (        0):  steps     44(     0)
+level 8  - duration[ms]      295 (        2):  steps    113(     0)
+level 9  - duration[ms]       17 (        0):  steps     30(     0)
+level 10 - duration[ms]      412 (       13):  steps     91(     0)
+level 11 - duration[ms]      234 (        5):  steps     80(     0)
+level 12 - duration[ms]       24 (        0):  steps     49(     0)
+level 13 - duration[ms]      507 (        2):  steps     63(     0)
+level 14 - duration[ms]       30 (        1):  steps     51(     0)
+level 15 - duration[ms]       46 (       -1):  steps     43(     0)
+level 16 - duration[ms]    25715 (   -74284):  steps    104( -9895)
+level 17 - duration[ms]       30 (   -99969):  steps     26( -9973)
+level 18 - duration[ms]      335 (   -99664):  steps     91( -9908)
+level 19 - duration[ms]      133 (   -99866):  steps     44( -9955)
+level 20 - duration[ms]      169 (   -99830):  steps     58( -9941)
+level 21 - duration[ms]       17 (   -99982):  steps     19( -9980)
+level 22 - duration[ms]      918 (   -99081):  steps     57( -9942)
+level 23 - duration[ms]       72 (   -99927):  steps     58( -9941)
+level 24 - duration[ms]       62 (   -99937):  steps     41( -9958)
+level 25 - duration[ms]       23 (   -99976):  steps     33( -9966)
+level 26 - duration[ms]      105 (   -99894):  steps     41( -9958)
+level 27 - duration[ms]      115 (   -99884):  steps     50( -9949)
+level 28 - duration[ms]       47 (   -99952):  steps     33( -9966)
+level 29 - duration[ms]      513 (   -99486):  steps    140( -9859)
+level 30 - duration[ms]       13 (   -99986):  steps     23( -9976)
+level 31 - duration[ms]       36 (   -99963):  steps     17( -9982)
+level 32 - duration[ms]       74 (   -99925):  steps     35( -9964)
+level 33 - duration[ms]      340 (   -99659):  steps     51( -9948)
+level 34 - duration[ms]     1186 (   -98813):  steps     45( -9954)
+level 35 - duration[ms]     1143 (   -98856):  steps     85( -9914)
+level 36 - Timed out
+level 37 - duration[ms]      731 (   -99268):  steps     71( -9928)
+level 38 - duration[ms]       98 (   -99901):  steps     39( -9960)
+level 39 - duration[ms]      235 (   -99764):  steps     85( -9914)
+level 40 - duration[ms]       30 (   -99969):  steps     25( -9974)
+level 41 - duration[ms]      104 (   -99895):  steps     58( -9941)
+level 42 - duration[ms]      471 (   -99528):  steps     70( -9929)
+level 43 - duration[ms]     4231 (   -95768):  steps     78( -9921)
+level 44 - duration[ms]        1 (   -99998):  steps      1( -9998)
+level 45 - duration[ms]       83 (   -99916):  steps     61( -9938)
+level 46 - duration[ms]       43 (   -99956):  steps     47( -9952)
+level 47 - duration[ms]      728 (   -99271):  steps    101( -9898)
+level 48 - duration[ms]     1724 (   -98275):  steps     77( -9922)
+level 49 - duration[ms]     1689 (   -98310):  steps    108( -9891)
+level 50 - duration[ms]      398 (   -99601):  steps     80( -9919)
+level 51 - duration[ms]       40 (   -99959):  steps     42( -9957)
+level 52 - duration[ms]       87 (   -99912):  steps     33( -9966)
+level 53 - duration[ms]      152 (   -99847):  steps     53( -9946)
+level 54 - Timed out
+level 55 - duration[ms]      201 (   -99798):  steps     72( -9927)
+level 56 - duration[ms]       20 (   -99979):  steps     23( -9976)
+level 57 - duration[ms]      464 (   -99535):  steps     66( -9933)
+level 58 - duration[ms]       42 (   -99957):  steps     46( -9953)
+level 59 - Timed out
+level 60 - duration[ms]     8349 (   -91650):  steps    251( -9748)
+level 61 - duration[ms]     1162 (   -98837):  steps    132( -9867)
+level 62 - duration[ms]     3014 (   -96985):  steps     82( -9917)
+level 63 - duration[ms]      241 (   -99758):  steps    101( -9898)
+level 64 - duration[ms]     9668 (   -90331):  steps     99( -9900)
+level 65 - duration[ms]    24038 (   -75961):  steps    184( -9815)
+level 66 - duration[ms]      677 (   -99322):  steps     95( -9904)
+level 67 - duration[ms]       59 (   -99940):  steps     53( -9946)
+level 68 - duration[ms]     1849 (   -98150):  steps     98( -9901)
+level 69 - duration[ms]    87095 (   -12904):  steps    148( -9851)
+level 70 - duration[ms]     1286 (   -98713):  steps     78( -9921)
+level 71 - duration[ms]      636 (   -99363):  steps    120( -9879)
+level 72 - duration[ms]     5766 (   -94233):  steps    131( -9868)
+level 73 - duration[ms]     2430 (   -97569):  steps    105( -9894)
+level 74 - duration[ms]   277539 (   177540):  steps    133( -9866)
+level 75 - duration[ms]    11916 (   -88083):  steps     96( -9903)
+level 76 - duration[ms]    33907 (   -66092):  steps    239( -9760)
+level 77 - duration[ms]    67734 (   -32265):  steps    221( -9778)
+level 78 - Timed out
+level 79 - duration[ms]      112 (   -99887):  steps     58( -9941)
+level 80 - duration[ms]   224696 (   124697):  steps    167( -9832)
+level 81 - duration[ms]      101 (   -99898):  steps     46( -9953)
+level 82 - duration[ms]       49 (   -99950):  steps     52( -9947)
+level 83 - Timed out
+level 84 - Timed out
+level 85 - duration[ms]   190872 (    90873):  steps    159( -9840)
+level 86 - duration[ms]     2889 (   -97110):  steps    149( -9850)
+level 87 - duration[ms]    55966 (   -44033):  steps    155( -9844)
+level 88 - duration[ms]    75223 (   -24776):  steps    211( -9788)
+level 89 - Timed out
+level 90 - duration[ms]     5309 (   -94690):  steps     83( -9916)
+level 91 - duration[ms]       89 (   -99910):  steps     50( -9949)
+level 92 - duration[ms]    14327 (   -85672):  steps    144( -9855)
+level 93 - Timed out
+level 94 - duration[ms]     1278 (   -98721):  steps     87( -9912)
+level 95 - duration[ms]       69 (   -99930):  steps     25( -9974)
+level 96 - duration[ms]    12268 (   -87731):  steps    136( -9863)
+level 97 - Timed out
+level 98 - Timed out
+level 99 - Timed out
+level 100 - duration[ms]    25709 (   -74290):  steps    185( -9814)
+level 101 - duration[ms]     2056 (   -97943):  steps     79( -9920)
+level 102 - Timed out
+level 103 - duration[ms]     3760 (   -96239):  steps     55( -9944)
+level 104 - duration[ms]     1594 (   -98405):  steps     93( -9906)
+level 105 - Timed out
+level 106 - Timed out
+level 107 - duration[ms]     9054 (   -90945):  steps     42( -9957)
+level 108 - Timed out
+level 109 - Timed out
+level 110 - duration[ms]      985 (   -99014):  steps     55( -9944)
+level 111 - Timed out
+level 112 - Timed out
+level 113 - Timed out
+level 114 - Timed out
+level 115 - duration[ms]    97153 (    -2846):  steps    156( -9843)
+level 116 - duration[ms]     3384 (   -96615):  steps     74( -9925)
+level 117 - Timed out
+level 118 - Timed out
+level 119 - duration[ms]    23858 (   -76141):  steps    169( -9830)
+level 120 - duration[ms]    12213 (   -87786):  steps    239( -9760)
+level 121 - duration[ms]    42003 (   -57996):  steps    141( -9858)
+level 122 - Timed out
+level 123 - Timed out
+level 124 - duration[ms]     7090 (   -92909):  steps    299( -9700)
+level 125 - Timed out
+level 126 - duration[ms]   278690 (   178691):  steps    147( -9852)
+level 127 - duration[ms]    23306 (   -76693):  steps    146( -9853)
+level 128 - duration[ms]     3591 (   -96408):  steps     94( -9905)
+level 129 - duration[ms]    30870 (   -69129):  steps    112( -9887)
+level 130 - duration[ms]   224984 (   124985):  steps    134( -9865)
+level 131 - Timed out
+level 132 - duration[ms]    18308 (   -81691):  steps    167( -9832)
+level 133 - Timed out
+level 134 - Timed out
+level 135 - duration[ms]   216575 (   116576):  steps    159( -9840)
+level 136 - Timed out
+level 137 - Timed out
+level 138 - Timed out
+level 139 - Timed out
+level 140 - Timed out
+level 141 - duration[ms]   199261 (    99262):  steps    169( -9830)
+level 142 - Timed out
+level 143 - Timed out
+level 144 - Timed out
+level 145 - duration[ms]   153252 (    53253):  steps     87( -9912)
+level 146 - Timed out
+level 147 - Timed out
+level 148 - duration[ms]    43801 (   -56198):  steps    232( -9767)
+level 149 - duration[ms]     4693 (   -95306):  steps     94( -9905)
+level 150 - Timed out
+level 151 - Timed out
+level 152 - duration[ms]    79243 (   -20756):  steps    289( -9710)
+level 153 - Timed out
+level 154 - duration[ms]      154 (   -99845):  steps    429( -9570)
+level 155 - duration[ms]     1717 (   -98282):  steps    282( -9717)
+{"beaten": 114, "avg time[ms]": 23474, "max time[ms]": 278690, "min time[ms]": 1, "avg steps": 97, "max steps": 429, "min steps": 1, "diff beaten": 99, "diff avg time[ms]": 23108, "diff max time[ms]": 276377, "diff min time[ms]": -8, "diff avg steps": 41, "diff max steps": 316, "diff min steps": -15}
