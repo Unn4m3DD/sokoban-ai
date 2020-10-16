@@ -8,11 +8,11 @@ import json
 
 
 file_read = "./stats.txt"
-if(len(sys.argv) > 1):
+if(len(sys.argv) > 2):
   file_read = sys.argv[2]
 
 end = 156
-if(len(sys.argv) > 2):
+if(len(sys.argv) > 3):
   end = int(sys.argv[3]) + 1
 
 last_attempt = [None]
