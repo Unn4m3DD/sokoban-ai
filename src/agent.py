@@ -13,7 +13,7 @@ class Agent:
     self.original_game = Game(original_map)
     self.tested = set()
     self.to_solve = [(self.original_game, self.original_game.cost())]
-    self.best_score = float("inf")
+    self.best_cost = float("inf")
 
   def solve(self, timeout):
     initial_time = time()
@@ -35,7 +35,12 @@ class Agent:
           i += 1
 
         self.to_solve.insert(i, (attempt, cost))
-
+        #print([i[1] for i in self.to_solve][:20])
+        if(self.best_cost > self.to_solve[-1][1]):
+          self.best_cost = self.to_solve[-1][1]
+          #print(self.to_solve[-1][0])
+          #print(self.to_solve[-1][1])
+          #print()
     return None
 
   def _get_valid_attempts(self, game):

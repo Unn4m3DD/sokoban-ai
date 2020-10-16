@@ -48,11 +48,11 @@ if(len(sys.argv) > 1 and sys.argv[1] == "-s"):
   file_save = open("./stats_new.txt", "w")
 for i in range(1, end):
   start_time = time()
-  _original_stdout = sys.stdout
-  sys.stdout = open(os.devnull, 'w')
+  #_original_stdout = sys.stdout
+  #sys.stdout = open(os.devnull, 'w')
   steps = Agent(open(f"levels/{i}.xsb").read()).solve(300)
-  sys.stdout.close()
-  sys.stdout = _original_stdout
+  #sys.stdout.close()
+  #sys.stdout = _original_stdout
   #print(">>", steps, "<<")
   elapsed_time = time() - start_time
   if(steps != None):

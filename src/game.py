@@ -1,6 +1,6 @@
 import copy
 from math import sqrt
-
+import time 
 
 directions = {"s": (0, 1),
               "d": (1, 0),
@@ -244,15 +244,38 @@ class Game:
     return False
 
   def cost(self):
-    def dist(p1, p2): return p1[0] - p2[0] + p1[1] - p2[1]
+    def dist(p1, p2):
+      def manhattan(p1, p2): return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+      to_test = [(p1, 0, manhattan(p1, p2))]
+      visited = set()
+      while(len(to_test) != 0):
+        popped = to_test.pop()
+        if(popped[0] in visited):
+          continue
+        visited.add(popped[0])
+        if(popped[0] == p2): return popped[1]
+        for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+          new_point = (popped[0][0] + direction[0],
+                       popped[0][1] + direction[1])
+          if(self.map[new_point[0]][new_point[1]] == "#"):
+            continue
+          item = (new_point, popped[1] + 1, manhattan(new_point, p2))
+          i = 0
+          while(i < len(to_test) and to_test[i][2] > item[2]):
+            i += 1
+          to_test.insert(i, item)
+
     cost = 0
     not_in_goal_boxes = [i for i in self.boxes if i not in self.goals]
     for box in not_in_goal_boxes:
       for goal in self.goals:
-        cost += dist(box, goal)
-    cost = 2 ** cost
-    cost = 0
-    cost -= 300 * (len(self.boxes) - len(not_in_goal_boxes))
+        start = time.time()
+        cost += dist(box, goal) 
+    for box in [i for i in self.boxes if i in self.goals]:
+      if(self._trapped(box, self.boxes)):
+        cost -= 50
+      else:
+        cost -= 100
     return cost
 
   def __str__(self):
