@@ -18,7 +18,7 @@ class Agent:
   def solve(self, timeout):
     initial_time = time()
     elapsed_time = 0
-    while(len(self.to_solve) != 0 and elapsed_time < timeout):
+    while(self.to_solve != [] and elapsed_time < timeout):
       elapsed_time = (time()) - initial_time
       popped = self.to_solve.pop()
       if(popped[0] in self.tested):
@@ -27,11 +27,13 @@ class Agent:
       attempts = self._get_valid_attempts(popped[0])
       for attempt in attempts:
         if(attempt.won()):
+          
           return attempt.path
 
         cost = attempt.cost()
         i = 0
-        while(i < len(self.to_solve) and self.to_solve[i][1] > cost):
+        to_solve_size = len(self.to_solve)
+        while(i < to_solve_size and self.to_solve[i][1] > cost):
           i += 1
 
         self.to_solve.insert(i, (attempt, cost))

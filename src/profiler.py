@@ -4,9 +4,9 @@ from time import time
 from agent import Agent
 import re
 import json
+
+import cProfile
 #usage arg1 : -s to save, arg2 source comp file, arg3 last test
-
-
 file_read = "./stats.txt"
 if(len(sys.argv) > 2):
   file_read = sys.argv[2]
@@ -17,7 +17,6 @@ if(len(sys.argv) > 3):
 
 last_attempt = [None]
 
-print(file_read)
 f = open(file_read, "r").read()
 for i in f.split("\n")[:-1]:
   try:
@@ -26,7 +25,6 @@ for i in f.split("\n")[:-1]:
     last_attempt.append((int(info[0]), int(info[1])))
   except:
     last_attempt.append(((99999), (9999)))
-print(last_attempt)
 try:
   last_attempt_info = json.loads(f.split("\n")[-1])
 except:

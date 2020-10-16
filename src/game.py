@@ -1,6 +1,6 @@
 import copy
 from math import sqrt
-import time 
+import time
 
 directions = {"s": (0, 1),
               "d": (1, 0),
@@ -145,18 +145,17 @@ class Game:
     result = []
     visited = set()
     queue = [(self.player, [])]
-    while(len(queue) != 0):
-      item = queue[0]
-      queue = queue[1:]
+    while(queue != []):
+      item = queue.pop()
       if(item[0] in visited):
         continue
       visited.add(item[0])
       for char, direction in (("s", (0, 1)), ("d", (1, 0)), ("w", (0, -1)), ("a", (-1, 0))):
         pos = (item[0][0] + direction[0], item[0][1] + direction[1])
         if(self.map[pos[0]][pos[1]] != "#" and pos not in self.boxes):
-          queue.append((pos, item[1] + [char]))
+          queue.insert(0, (pos, item[1] + [char]))
         elif(pos in self.boxes and self.can_move(direction, (pos[0] - direction[0], pos[1] - direction[1]))):
-          result.append(item[1] + [char])
+          result.insert(0, item[1] + [char])
     return result
 
   def perform_event(self, event):
@@ -246,6 +245,8 @@ class Game:
   def cost(self):
     def dist(p1, p2):
       def manhattan(p1, p2): return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+      return manhattan(p1, p2)
+      # code below not used cause it's slow af
       to_test = [(p1, 0, manhattan(p1, p2))]
       visited = set()
       while(len(to_test) != 0):
@@ -253,7 +254,8 @@ class Game:
         if(popped[0] in visited):
           continue
         visited.add(popped[0])
-        if(popped[0] == p2): return popped[1]
+        if(popped[0] == p2):
+          return popped[1]
         for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
           new_point = (popped[0][0] + direction[0],
                        popped[0][1] + direction[1])
@@ -266,16 +268,17 @@ class Game:
           to_test.insert(i, item)
 
     cost = 0
-    not_in_goal_boxes = [i for i in self.boxes if i not in self.goals]
-    for box in not_in_goal_boxes:
-      for goal in self.goals:
-        start = time.time()
-        cost += dist(box, goal) 
-    for box in [i for i in self.boxes if i in self.goals]:
-      if(self._trapped(box, self.boxes)):
-        cost -= 50
+
+    for box in self.boxes:
+      if (box not in self.goals):
+        pass
+        #costs = []
+        #for goal in self.goals:
+        #  costs.append(dist(box, goal))
+        #cost += min(costs)
       else:
         cost -= 100
+
     return cost
 
   def __str__(self):
@@ -316,11 +319,11 @@ class Game:
   def clone(self):
     result = Game()
     result.map = self.map
-    result.boxes = copy.deepcopy(self.boxes)
-    result.player = copy.deepcopy(self.player)
+    result.boxes = self.boxes[:]
+    result.player = tuple(self.player)
     result.goals = self.goals
     result.deadlocks = self.deadlocks
-    result.path = copy.deepcopy(self.path)
+    result.path = self.path[:]
     return result
 
   def __eq__(self, other):
@@ -332,7 +335,7 @@ class Game:
   def __hash__(self):
     # return hash("".join("".join(i) for i in self.map))
     # return hash(tuple([hash(tuple(l)) for l in self.map]))
-    return hash(self.player) + hash(tuple(self.boxes))
+    return hash(tuple(self.boxes))
 
 
 if __name__ == "__main__":
