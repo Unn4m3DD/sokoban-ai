@@ -1,7 +1,7 @@
 import copy
 from math import sqrt
 import time
-
+from collections import deque
 directions = {"s": (0, 1),
               "d": (1, 0),
               "w": (0, -1),
@@ -41,13 +41,13 @@ class Game:
         if self.map[x][y] in [".", "$", "*", "@", "+"]:
           self.map[x][y] = "-"
     self._bfs_available_positions()
-    self.deadlocks = self._search_deadlocks()
+    self.deadlocks = self._static_deadlocks()
     for goal in self.goals:
       if(goal in self.deadlocks):
         self.deadlocks.remove(goal)
     self.path = []
 
-  def _search_deadlocks(self):
+  def _static_deadlocks(self):
     deadlocks = set()
     for x in range(1, len(self.map) - 1):
       for y in range(1, len(self.map[x]) - 1):
@@ -64,10 +64,10 @@ class Game:
 
   def _bfs_available_positions(self):
     visited = set()
-    queue = [self.player]
+    queue = deque()
+    queue.append(self.player)
     while(len(queue) != 0):
-      item = queue[0]
-      queue = queue[1:]
+      item = queue.popleft()
       if(item in visited):
         continue
       visited.add(item)
@@ -98,11 +98,14 @@ class Game:
            (self.map[possibly_wall[i + 1][0]][possibly_wall[i + 1][1]] == "#" or possibly_wall[i+1] in self.boxes)):
           if(possibly_wall[i] in self.boxes):
             if(self._trapped(possibly_wall[i], [box])):
-
               return True
           if(possibly_wall[i + 1] in self.boxes):
             if(self._trapped(possibly_wall[i + 1], [box])):
               return True
+          if(possibly_wall[i] in self.boxes and possibly_wall[i + 1] in self.boxes):
+            if(self._trapped(possibly_wall[i], [box]) and self._trapped(possibly_wall[i + 1], [box])):
+              return True
+
     return False
 
   def can_move(self, direction, source=None):
@@ -144,18 +147,19 @@ class Game:
   def available_events(self):
     result = []
     visited = set()
-    queue = [(self.player, [])]
-    while(queue != []):
-      item = queue.pop()
+    queue = deque()
+    queue.append((self.player, []))
+    while(len(queue) != 0):
+      item = queue.popleft()
       if(item[0] in visited):
         continue
       visited.add(item[0])
       for char, direction in (("s", (0, 1)), ("d", (1, 0)), ("w", (0, -1)), ("a", (-1, 0))):
         pos = (item[0][0] + direction[0], item[0][1] + direction[1])
         if(self.map[pos[0]][pos[1]] != "#" and pos not in self.boxes):
-          queue.insert(0, (pos, item[1] + [char]))
+          queue.append((pos, item[1] + [char]))
         elif(pos in self.boxes and self.can_move(direction, (pos[0] - direction[0], pos[1] - direction[1]))):
-          result.insert(0, item[1] + [char])
+          result.append(item[1] + [char])
     return result
 
   def perform_event(self, event):
@@ -249,7 +253,7 @@ class Game:
       # code below not used cause it's slow af
       to_test = [(p1, 0, manhattan(p1, p2))]
       visited = set()
-      while(len(to_test) != 0):
+      while(to_test != []):
         popped = to_test.pop()
         if(popped[0] in visited):
           continue

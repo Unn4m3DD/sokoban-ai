@@ -1,5 +1,3 @@
-import math
-import json
 from time import time
 from game import Game
 
@@ -9,25 +7,25 @@ directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 class Agent:
 
   def __init__(self, original_map):
-    self.current = -1
-    self.original_game = Game(original_map)
+    original_game = Game(original_map)
     self.tested = set()
-    self.to_solve = [(self.original_game, self.original_game.cost())]
+    self.to_solve = [(original_game, original_game.cost())]
     self.best_cost = float("inf")
 
   def solve(self, timeout):
     initial_time = time()
     elapsed_time = 0
-    while(self.to_solve != [] and elapsed_time < timeout):
-      elapsed_time = (time()) - initial_time
+    while(elapsed_time < timeout and self.to_solve != []):
+      elapsed_time = time() - initial_time
+
       popped = self.to_solve.pop()
       if(popped[0] in self.tested):
         continue
       self.tested.add(popped[0])
+
       attempts = self._get_valid_attempts(popped[0])
       for attempt in attempts:
         if(attempt.won()):
-          
           return attempt.path
 
         cost = attempt.cost()
@@ -37,7 +35,6 @@ class Agent:
           i += 1
 
         self.to_solve.insert(i, (attempt, cost))
-        #print([i[1] for i in self.to_solve][:20])
         if(self.best_cost > self.to_solve[-1][1]):
           self.best_cost = self.to_solve[-1][1]
           #print(self.to_solve[-1][0])
