@@ -30,7 +30,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
           await websocket.send(
               json.dumps({"cmd": "key", "key": key})
           )
-          #
           # sleep(.2)
         except Exception as e:
           print(e)

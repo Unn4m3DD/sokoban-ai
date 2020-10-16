@@ -82,6 +82,29 @@ class Game:
     for pos in visited:
       self.map[pos[0]][pos[1]] = "-"
 
+  def _dynamic_deadlock(self, source,  box):
+    if(box in self.goals):
+      return False
+    possibly_wall = [
+        (0 + box[0], 1 + box[1]),
+        (1 + box[0], 0 + box[1]),
+        (0 + box[0], -1 + box[1]),
+        (-1 + box[0], 0 + box[1]),
+        (0 + box[0], 1 + box[1])
+    ]
+    for i in range(0, 4):
+      if(possibly_wall[i] != source and possibly_wall[i + 1] != source):
+        if((self.map[possibly_wall[i][0]][possibly_wall[i][1]] == "#" or possibly_wall[i] in self.boxes) and
+           (self.map[possibly_wall[i + 1][0]][possibly_wall[i + 1][1]] == "#" or possibly_wall[i+1] in self.boxes)):
+          if(possibly_wall[i] in self.boxes):
+            if(self._trapped(possibly_wall[i], [box])):
+
+              return True
+          if(possibly_wall[i + 1] in self.boxes):
+            if(self._trapped(possibly_wall[i + 1], [box])):
+              return True
+    return False
+
   def can_move(self, direction, source=None):
     if(source == None):
       source = self.player
@@ -92,8 +115,9 @@ class Game:
     box_target = (target[0] + direction[0], target[1] + direction[1])
     if(target in self.boxes and
        (box_target in self.boxes or
-            self.map[box_target[0]][box_target[1]] == "#" or
-            box_target in self.deadlocks)
+        self.map[box_target[0]][box_target[1]] == "#" or
+        box_target in self.deadlocks or
+        self._dynamic_deadlock(target, box_target))
        ):
       return False
 
@@ -145,7 +169,7 @@ class Game:
         return False
     return True
 
-  def _trapped(self, box):
+  def _trapped(self, box, virtual_walls=[]):
     lost_condition = [
         (0 + box[0], 1 + box[1]),
         (1 + box[0], 0 + box[1]),
@@ -155,8 +179,8 @@ class Game:
     ]
 
     for i in range(0, 4):
-      if(self.map[lost_condition[i][0]][lost_condition[i][1]] == "#" and
-         self.map[lost_condition[i + 1][0]][lost_condition[i + 1][1]] == "#"):
+      if((self.map[lost_condition[i][0]][lost_condition[i][1]] == "#" or lost_condition[i] in virtual_walls) and
+         (self.map[lost_condition[i + 1][0]][lost_condition[i + 1][1]] == "#" or lost_condition[i + 1] in virtual_walls)):
         return True
     return False
 

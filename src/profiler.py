@@ -44,7 +44,7 @@ for i in range(len(last_attempt), 156):
 
 current_attempt = [None]
 file_save = None
-if(len(sys.argv) > 0 and sys.argv[1] == "-s"):
+if(len(sys.argv) > 1 and sys.argv[1] == "-s"):
   file_save = open("./stats_new.txt", "w")
 for i in range(1, end):
   start_time = time()
