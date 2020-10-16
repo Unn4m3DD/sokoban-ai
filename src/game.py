@@ -271,11 +271,10 @@ class Game:
 
     for box in self.boxes:
       if (box not in self.goals):
-        pass
-        #costs = []
-        #for goal in self.goals:
-        #  costs.append(dist(box, goal))
-        #cost += min(costs)
+        costs = []
+        for goal in self.goals:
+          costs.append(dist(box, goal))
+        cost += min(costs)
       else:
         cost -= 100
 
