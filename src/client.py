@@ -7,12 +7,13 @@ import websockets
 from agent import Agent
 from time import sleep
 
+
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
   async with websockets.connect(f"ws://{server_address}/player", close_timeout=10000) as websocket:
 
     await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
     await websocket.recv()
-    for i in range(60, 156):
+    for i in range(1, 156):
       agent = Agent(open(f"levels/{i}.xsb").read())
       solution = None
       while solution == None:
@@ -24,15 +25,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
           return
       if(solution == None):
         continue
-      for key in solution:
-        try:
-          await websocket.recv()
-          await websocket.send(
-              json.dumps({"cmd": "key", "key": key})
-          )
-          # sleep(.2)
-        except Exception as e:
-          print(e)
+      await websocket.recv()
+      await websocket.send(
+          json.dumps({"cmd": "keys", "keys": "".join(solution)})
+      )
+
 
 def main():
   loop = asyncio.get_event_loop()
@@ -40,6 +37,7 @@ def main():
   PORT = os.environ.get("PORT", "8000")
   NAME = "93357"
   loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
+
 
 if __name__ == "__main__":
   main()
