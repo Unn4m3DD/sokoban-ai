@@ -249,6 +249,7 @@ class Game:
   def cost(self):
     def dist(p1, p2):
       def manhattan(p1, p2): return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+      def euclidian(p1, p2): return (p1[0] - p2[0])**2 + abs(p1[1] - p2[1])**2
       return manhattan(p1, p2)
       # code below not used cause it's slow af
       to_test = [(p1, 0, manhattan(p1, p2))]
@@ -275,10 +276,12 @@ class Game:
 
     for box in self.boxes:
       if (box not in self.goals):
-        costs = []
+        min_cost = float("inf")
         for goal in self.goals:
-          costs.append(dist(box, goal))
-        cost += min(costs)
+          distance = dist(box, goal)
+          if(distance < min_cost):
+            min_cost = dist(box, goal)
+        cost += min_cost ** 2
       else:
         cost -= 100
 

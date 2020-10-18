@@ -8,5 +8,6 @@
     "highscores.json": true,
     "**/__pycache__/": true,
     "student.py": true
-  }
+  },
+  "python.pythonPath": "venv/bin/python"
 }
