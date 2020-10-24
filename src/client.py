@@ -2,7 +2,7 @@ import asyncio
 import getpass
 import json
 import os
-
+from time import time
 import websockets
 from agent import Agent
 from time import sleep
@@ -12,23 +12,33 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
   async with websockets.connect(f"ws://{server_address}/player", close_timeout=10000) as websocket:
 
     await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
-    await websocket.recv()
-    for i in range(1, 156):
-      agent = Agent(open(f"levels/{i}.xsb").read())
+    server_request = json.loads(await websocket.recv())
+    print(server_request)
+    fps = int(server_request["fps"])
+    level = server_request["map"]
+    agent = Agent(open(level).read())
+    while True:
+      level = json.loads(await websocket.recv())["level"]
+      agent = Agent(open(f"levels/{level}.xsb").read())
       solution = None
       while solution == None:
         try:
-          await websocket.recv()
-          solution = agent.solve(.1)
+          start_time = time()
+          solution = agent.solve(float("inf"))
+          elapsed_time = time() - start_time
+
+          for i in range(0, int(elapsed_time * fps + 10)):
+            await websocket.recv()
+
+          for key in solution:
+            await websocket.send(
+                json.dumps({"cmd": "key", "key": key})
+            )
+            await websocket.recv()
+
         except websockets.exceptions.ConnectionClosedOK:
           print("Server has cleanly disconnected us")
           return
-      if(solution == None):
-        continue
-      await websocket.recv()
-      await websocket.send(
-          json.dumps({"cmd": "keys", "keys": "".join(solution)})
-      )
 
 
 def main():

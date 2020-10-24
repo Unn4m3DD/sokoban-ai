@@ -271,9 +271,8 @@ class Game:
           while(i < len(to_test) and to_test[i][2] > item[2]):
             i += 1
           to_test.insert(i, item)
-
     cost = 0
-
+    correct = 10
     for box in self.boxes:
       if (box not in self.goals):
         min_cost = float("inf")
@@ -283,9 +282,8 @@ class Game:
             min_cost = dist(box, goal)
         cost += min_cost ** 2
       else:
-        cost -= 100
-
-    return cost
+        correct <<= 2
+    return cost - correct
 
   def __str__(self):
     local_map = list(self.map)
