@@ -247,6 +247,8 @@ class Game:
     return False
 
   def cost(self):
+    return len(self.path)
+    
     def dist(p1, p2):
       def manhattan(p1, p2): return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
       def euclidian(p1, p2): return (p1[0] - p2[0])**2 + abs(p1[1] - p2[1])**2
