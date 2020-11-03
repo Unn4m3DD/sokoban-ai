@@ -11,7 +11,7 @@ import websockets
 import pygame
 from consts import RANKS, Tiles
 from mapa import Map
-from server_game import reduce_score
+from game import reduce_score
 
 logging.basicConfig(level=logging.DEBUG)
 logger_websockets = logging.getLogger("websockets")
@@ -283,11 +283,11 @@ async def main_loop(queue):
         try:
             state = json.loads(queue.get_nowait())
             new_event = True
-            if "step" in state and state["step"] <= 1:
+            if "map" in state:
                 logger.debug("New Level!")
                 # New level! lets clean everything up!
                 try:
-                    mapa = Map(f"levels/{state['level']}.xsb")
+                    mapa = Map(state["map"])
                 except FileNotFoundError:
                     logger.error(
                         "Can't find levels/%s.xsb, means we have a WINNER!",
@@ -301,7 +301,6 @@ async def main_loop(queue):
                 boxes_group.empty()
                 main_group.empty()
                 main_group.add(Keeper(pos=mapa.keeper))
-                mapa.level = state["level"]
                 pygame.display.flip()
 
         except asyncio.queues.QueueEmpty:

@@ -4,6 +4,7 @@ import json
 import logging
 
 from mapa import Map, Tiles
+from consts import GameStatus
 
 logger = logging.getLogger("Game")
 logger.setLevel(logging.DEBUG)
@@ -131,7 +132,7 @@ class Game:
     def update_keeper(self):
         """Update the location of the Keeper."""
         if self._lastkeypress == "":
-            return
+            return GameStatus.NO_OPERATION
         try:
             # Update position
             self.move(self.map.keeper, self._lastkeypress)
@@ -146,6 +147,9 @@ class Game:
         if self.map.completed:
             logger.info("Level %s completed", self.level)
             self.next_level(self.level + 1)
+            return GameStatus.NEW_MAP
+
+        return GameStatus.RUNNING
 
     async def next_frame(self):
         """Calculate next frame."""
@@ -162,7 +166,7 @@ class Game:
         if self._step % 100 == 0:
             logger.debug("[%s] SCORE %s", self._step, self.score)
 
-        self.update_keeper()
+        game_status = self.update_keeper()
 
         self._state = {
             "player": self._player_name,
@@ -172,6 +176,8 @@ class Game:
             "keeper": self.map.keeper,
             "boxes": self.map.boxes,
         }
+
+        return game_status
 
     @property
     def state(self):

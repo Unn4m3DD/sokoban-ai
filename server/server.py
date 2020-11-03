@@ -13,8 +13,8 @@ import requests
 from requests import RequestException
 import websockets
 
-from consts import MAX_HIGHSCORES
-from server_game import Game, reduce_score
+from consts import MAX_HIGHSCORES, GameStatus
+from game import Game, reduce_score, TIMEOUT
 
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -41,7 +41,7 @@ class GameServer:
     self.grading = grading
     self._level = level
     self._timeout = timeout
-    self.locked = False
+
     self._highscores = []
     if os.path.isfile(HIGHSCORE_FILE):
       with open(HIGHSCORE_FILE, "r") as infile:
@@ -75,11 +75,10 @@ class GameServer:
       )
     await self.current_player.ws.send(json.dumps(game_info))
 
-  async def incoming_handler(self, websocket, path):
+  async def incomming_handler(self, websocket, path):
     """Process new clients arriving at the server."""
     try:
       async for message in websocket:
-        #print(message)
         data = json.loads(message)
         if data["cmd"] == "join":
           if path == "/player":
@@ -98,13 +97,6 @@ class GameServer:
             self.game.keypress(data["key"][0])
           else:
             self.game.keypress("")
-
-        if data["cmd"] == "keys" and self.current_player.ws == websocket:
-          logger.debug((self.current_player.name, data))
-          print(data["keys"])
-          for key in data["keys"]:
-            self.game.keypress(key)
-            await self.game.next_frame()
 
     except websockets.exceptions.ConnectionClosed as closed_reason:
       logger.info("Client disconnected: %s", closed_reason)
@@ -134,7 +126,12 @@ class GameServer:
           game_record["papertrail"] = self.game.papertrail
 
         while self.game.running:
-          await self.game.next_frame()
+          game_status = await self.game.next_frame()
+
+          if game_status == GameStatus.NEW_MAP:
+            game_info = self.game.info()
+            await self.send_info(game_info)
+
           state = self.game.state
           await self.current_player.ws.send(state)
           if self.viewers:
@@ -153,7 +150,7 @@ class GameServer:
       finally:
         try:
           if self.grading:
-            game_record["score"] = reduce(add, self.game.score, 0)
+            game_record["total_moves"], game_record["total_pushes"], game_record["total_steps"] = self.game.score
             game_record["papertrail"] = self.game.papertrail
             game_record["level"] = self.game.level
             requests.post(self.grading, json=game_record)
@@ -172,13 +169,12 @@ if __name__ == "__main__":
   parser.add_argument("--level", help="start on level", type=int, default=1)
   parser.add_argument("--seed", help="Seed number", type=int, default=0)
   parser.add_argument(
-      "--timeout", help="Timeout after this amount of steps", type=int, default=3000
+      "--timeout", help="Timeout after this amount of steps", type=int, default=TIMEOUT
   )
   parser.add_argument(
       "--grading-server",
       help="url of grading server",
-      default=None,
-      # TODO        default="http://sokoban-aulas.ws.atnog.av.it.pt/game",
+      default="http://sokoban-aulas.ws.atnog.av.it.pt/game",
   )
   args = parser.parse_args()
 
@@ -191,7 +187,7 @@ if __name__ == "__main__":
 
   logger.info("Listenning @ %s:%s", args.bind, args.port)
   websocket_server = websockets.serve(
-      g.incoming_handler, args.bind, args.port)
+      g.incomming_handler, args.bind, args.port)
 
   loop = asyncio.get_event_loop()
   loop.run_until_complete(asyncio.gather(websocket_server, game_loop_task))
