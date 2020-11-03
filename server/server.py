@@ -14,7 +14,7 @@ from requests import RequestException
 import websockets
 
 from consts import MAX_HIGHSCORES, GameStatus
-from game import Game, reduce_score, TIMEOUT
+from server_game import Game, reduce_score, TIMEOUT
 
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
