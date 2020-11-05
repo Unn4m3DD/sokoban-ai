@@ -1,5 +1,6 @@
 from time import time
 from game import Game
+from collections import deque
 
 directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
@@ -9,7 +10,8 @@ class Agent:
   def __init__(self, original_map):
     original_game = Game(original_map)
     self.tested = set()
-    self.to_solve = [(original_game, original_game.cost())]
+    self.to_solve = deque()
+    self.to_solve.append((original_game, original_game.cost()))
     self.best_cost = float("inf")
 
   def solve(self, timeout):
@@ -35,11 +37,11 @@ class Agent:
           i += 1
 
         self.to_solve.insert(i, (attempt, cost))
+        print(self.to_solve[-1][0])
         if(self.best_cost > self.to_solve[-1][1]):
           self.best_cost = self.to_solve[-1][1]
-          #print(self.to_solve[-1][0])
-          #print(self.to_solve[-1][1])
-          #print()
+          # print(self.to_solve[-1][1])
+          # print()
     return None
 
   def _get_valid_attempts(self, game):

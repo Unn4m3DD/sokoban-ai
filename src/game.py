@@ -6,6 +6,10 @@ directions = {"s": (0, 1),
               "d": (1, 0),
               "w": (0, -1),
               "a": (-1, 0)}
+inv_directions = {(0, 1): "s",
+                  (1, 0): "d",
+                  (0, -1): "w",
+                  (-1, 0): "a"}
 
 
 class Game:
@@ -82,31 +86,51 @@ class Game:
     for pos in visited:
       self.map[pos[0]][pos[1]] = "-"
 
-  def _dynamic_deadlock(self, source,  box):
-    if(box in self.goals):
+  def _dynamic_deadlock_adjacent(self, adjacent1, adjacent2,  box, virtual_boxes, virtual_wall=[], ignore_goals=False):
+    return ((adjacent1 in virtual_wall or adjacent2 in virtual_wall
+             or self.map[adjacent1[0]][adjacent1[1]] == "#" or self.map[adjacent2[0]][adjacent2[1]] == "#")
+            or (adjacent1 in self.deadlocks and adjacent2 in self.deadlocks)
+            or (adjacent1 in virtual_boxes and
+                self._dynamic_deadlock(adjacent1, virtual_boxes, virtual_wall + [box], ignore_goals)) or
+            (adjacent2 in virtual_boxes and
+             self._dynamic_deadlock(adjacent2, virtual_boxes, virtual_wall + [box], ignore_goals)))
+
+  def _dynamic_vertical_deadlock(self, box, virtual_boxes, virtual_wall=[], ignore_goals=False):
+    adjacent1 = (box[0], box[1] + 1)
+    adjacent2 = (box[0], box[1] - 1)
+    return (self._dynamic_deadlock_adjacent(adjacent1, adjacent2, box, virtual_boxes, virtual_wall, ignore_goals))
+
+  def _dynamic_horizontal_deadlock(self, box, virtual_boxes, virtual_wall=[], ignore_goals=False):
+    adjacent1 = (box[0] + 1, box[1])
+    adjacent2 = (box[0] - 1, box[1])
+    return (self._dynamic_deadlock_adjacent(adjacent1, adjacent2, box, virtual_boxes, virtual_wall, ignore_goals))
+
+  def _dynamic_deadlock(self, box, virtual_boxes, virtual_wall=[], ignore_goals=False):
+    if(not ignore_goals and box in self.goals):
       return False
-    possibly_wall = [
-        (0 + box[0], 1 + box[1]),
-        (1 + box[0], 0 + box[1]),
-        (0 + box[0], -1 + box[1]),
-        (-1 + box[0], 0 + box[1]),
-        (0 + box[0], 1 + box[1])
-    ]
-    for i in range(0, 4):
-      if(possibly_wall[i] != source and possibly_wall[i + 1] != source):
-        if((self.map[possibly_wall[i][0]][possibly_wall[i][1]] == "#" or possibly_wall[i] in self.boxes) and
-           (self.map[possibly_wall[i + 1][0]][possibly_wall[i + 1][1]] == "#" or possibly_wall[i+1] in self.boxes)):
-          if(possibly_wall[i] in self.boxes):
-            if(self._trapped(possibly_wall[i], [box])):
-              return True
-          if(possibly_wall[i + 1] in self.boxes):
-            if(self._trapped(possibly_wall[i + 1], [box])):
-              return True
-          if(possibly_wall[i] in self.boxes and possibly_wall[i + 1] in self.boxes):
-            if(self._trapped(possibly_wall[i], [box]) and self._trapped(possibly_wall[i + 1], [box])):
-              return True
+    if (self._dynamic_vertical_deadlock(box, virtual_boxes, virtual_wall, ignore_goals) and
+            self. _dynamic_horizontal_deadlock(box, virtual_boxes, virtual_wall, ignore_goals)):
+      return True
 
     return False
+
+  def _curral_locked(self, box, virtual_boxes):
+    visited = set()
+    queue = deque()
+    queue.append(box)
+    while(len(queue) != 0):
+      item = queue.popleft()
+      if(item in visited):
+        continue
+      visited.add(item)
+      for i in ((0, 1), (1, 0), (0, -1), (-1, 0)):
+        pos = (item[0] + i[0], item[1] + i[1])
+        if(pos == self.player):
+          return False
+        if(self.map[pos[0]][pos[1]] != "#"):
+          if (pos not in virtual_boxes or not self._dynamic_deadlock(box, virtual_boxes, [], True)):
+            queue.append(pos)
+    return True
 
   def can_move(self, direction, source=None):
     if(source == None):
@@ -116,14 +140,21 @@ class Game:
       return False
 
     box_target = (target[0] + direction[0], target[1] + direction[1])
-    if(target in self.boxes and
-       (box_target in self.boxes or
-        self.map[box_target[0]][box_target[1]] == "#" or
-        box_target in self.deadlocks or
-        self._dynamic_deadlock(target, box_target))
-       ):
-      return False
-
+    virtual_boxes = [i for i in self.boxes if i != target]
+    virtual_boxes.append(box_target)
+    if(target in self.boxes):
+      if (
+          box_target in self.boxes or
+          self.map[box_target[0]][box_target[1]] == "#" or
+          box_target in self.deadlocks or
+          self._dynamic_deadlock(box_target, virtual_boxes)
+      ):
+        return False
+    global inv_directions
+    for box in virtual_boxes:
+      if(box not in self.goals):
+        if(self._curral_locked(box, virtual_boxes)):
+          return False
     return True
 
   def _move_player(self, direction):
@@ -158,13 +189,36 @@ class Game:
         pos = (item[0][0] + direction[0], item[0][1] + direction[1])
         if(self.map[pos[0]][pos[1]] != "#" and pos not in self.boxes):
           queue.append((pos, item[1] + [char]))
-        elif(pos in self.boxes and self.can_move(direction, (pos[0] - direction[0], pos[1] - direction[1]))):
+        elif(pos in self.boxes and self.can_move(direction, item[0])):
           result.append(item[1] + [char])
     return result
 
   def perform_event(self, event):
+    global directions
     for action in event:
       self.move(action)
+    last_action = event[-1]
+    direction = directions[last_action]
+
+    while False:
+      destinaton = (self.player[0] + direction[0],
+                    self.player[1] + direction[1])
+      if(destinaton in self.goals):
+        print("end\n", self)
+        return
+      if(last_action in ["a", "d"]):
+        bound1 = (destinaton[0] - direction[0], destinaton[1] + 1)
+        bound2 = (destinaton[0] - direction[0], destinaton[1] - 1)
+      else:
+        bound1 = (destinaton[0] + 1, destinaton[1] - direction[1])
+        bound2 = (destinaton[0] - 1, destinaton[1] - direction[1])
+      if(self.map[bound1[0]][bound1[1]] == "#"
+         and self.map[bound2[0]][bound2[1]] == "#"
+         and self.can_move(direction)):
+        self.move(last_action)
+      else:
+        print("end\n", self)
+        return
 
   def won(self):
     for box in self.boxes:
@@ -247,8 +301,7 @@ class Game:
     return False
 
   def cost(self):
-    return len(self.path)
-    
+    # return len(self.path)
     def dist(p1, p2):
       def manhattan(p1, p2): return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
       def euclidian(p1, p2): return (p1[0] - p2[0])**2 + abs(p1[1] - p2[1])**2
@@ -341,30 +394,35 @@ class Game:
   def __hash__(self):
     # return hash("".join("".join(i) for i in self.map))
     # return hash(tuple([hash(tuple(l)) for l in self.map]))
-    return hash(tuple(self.boxes))
+    result = 0
+    for i in self.boxes:
+      result += i[0] + i[1]
+    return result +  hash(self.player)
+
 
 
 if __name__ == "__main__":
-  game = Game("""####
-#-.#
-#--###
-#*@--#
-#--$-#
-#--###
-####
+  game = Game("""-#########
+##---#---##
+#----#----#
+#--$-#-$--#
+#---*.*---#
+####.@.####
+#---*.----#
+#--$-#-$--#
+#----#----#
+##---#---##
+-#########
 """)
   print(game.available_events())
   print(game)
   while(True):
     first = True
     direction = input("")
-    while(not game.can_move(direction)):
+    while(not game.can_move(directions[direction])):
       direction = input("")
     game.move(direction)
     print(game)
-    if(game.lost()):
-      print("lost")
-      break
     if(game.won()):
       print("won")
       break

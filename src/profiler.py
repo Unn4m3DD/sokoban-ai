@@ -44,7 +44,7 @@ current_attempt = [None]
 file_save = None
 if(len(sys.argv) > 1 and sys.argv[1] == "-s"):
   file_save = open("./stats_new.txt", "w")
-for i in range(1, end):
+for i in range(93, end):
   start_time = time()
   #_original_stdout = sys.stdout
   #sys.stdout = open(os.devnull, 'w')

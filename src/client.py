@@ -21,24 +21,24 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
       level = json.loads(await websocket.recv())["level"]
       agent = Agent(open(f"levels/{level}.xsb").read())
       solution = None
-      while solution == None:
-        try:
+      try:
+        while solution == None:
           start_time = time()
-          solution = agent.solve(float("inf"))
+          solution = agent.solve(100)
           elapsed_time = time() - start_time
 
           for i in range(0, int(elapsed_time * fps + 10)):
             await websocket.recv()
 
-          for key in solution:
-            await websocket.send(
-                json.dumps({"cmd": "key", "key": key})
-            )
-            await websocket.recv()
+        for key in solution:
+          await websocket.send(
+              json.dumps({"cmd": "key", "key": key})
+          )
+          await websocket.recv()
 
-        except websockets.exceptions.ConnectionClosedOK:
-          print("Server has cleanly disconnected us")
-          return
+      except websockets.exceptions.ConnectionClosedOK:
+        print("Server has cleanly disconnected us")
+        return
 
 
 def main():
