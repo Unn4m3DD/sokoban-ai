@@ -6,18 +6,17 @@ directions = {"s": (0, 1),
               "d": (1, 0),
               "w": (0, -1),
               "a": (-1, 0)}
-inv_directions = {(0, 1): "s",
-                  (1, 0): "d",
-                  (0, -1): "w",
-                  (-1, 0): "a"}
+
 
 
 class Game:
+  curral_and_greedy = False
 
   def __init__(self, map_content=None):
     if(map_content == None):
       return
     self.map = [[j for j in i] for i in map_content.split("\n")][:-1]
+    self.curral_count = 0
     max_length = 0
     for i in self.map:
       if len(i) > max_length:
@@ -50,6 +49,20 @@ class Game:
       if(goal in self.deadlocks):
         self.deadlocks.remove(goal)
     self.path = []
+
+    matched = [-1 for i in self.boxes]  # index box, content goal
+    distances = []  # (box, goal, distance)
+    for box in range(len(self.boxes)):
+      for goal in range(len(self.goals)):
+        distances.append((box, goal, self.push_distance(
+            self.boxes[box], self.goals[goal])))
+    distances = sorted(distances, key=lambda e: e[2])
+
+    for pair in distances:
+      if(matched[pair[0]] == -1 and pair[1] not in matched):
+        matched[pair[0]] = pair[1]
+
+    self.boxes = [self.boxes[i] for i in matched]
 
   def _static_deadlocks(self):
     deadlocks = set()
@@ -90,10 +103,10 @@ class Game:
     return ((adjacent1 in virtual_wall or adjacent2 in virtual_wall
              or self.map[adjacent1[0]][adjacent1[1]] == "#" or self.map[adjacent2[0]][adjacent2[1]] == "#")
             or (adjacent1 in self.deadlocks and adjacent2 in self.deadlocks)
-            or (adjacent1 in virtual_boxes and
-                self._dynamic_deadlock(adjacent1, virtual_boxes, virtual_wall + [box], ignore_goals)) or
-            (adjacent2 in virtual_boxes and
-             self._dynamic_deadlock(adjacent2, virtual_boxes, virtual_wall + [box], ignore_goals)))
+            or ((adjacent1 in virtual_boxes and
+                 self._dynamic_deadlock(adjacent1, virtual_boxes, virtual_wall + [box], ignore_goals)) or
+                (adjacent2 in virtual_boxes and
+                 self._dynamic_deadlock(adjacent2, virtual_boxes, virtual_wall + [box], ignore_goals))))
 
   def _dynamic_vertical_deadlock(self, box, virtual_boxes, virtual_wall=[], ignore_goals=False):
     adjacent1 = (box[0], box[1] + 1)
@@ -128,7 +141,7 @@ class Game:
         if(pos == self.player):
           return False
         if(self.map[pos[0]][pos[1]] != "#"):
-          if (pos not in virtual_boxes or not self._dynamic_deadlock(box, virtual_boxes, [], True)):
+          if (pos not in virtual_boxes or not self._dynamic_deadlock(pos, virtual_boxes, [], True)):
             queue.append(pos)
     return True
 
@@ -150,11 +163,11 @@ class Game:
           self._dynamic_deadlock(box_target, virtual_boxes)
       ):
         return False
-    global inv_directions
-    for box in virtual_boxes:
-      if(box not in self.goals):
-        if(self._curral_locked(box, virtual_boxes)):
-          return False
+    if(Game.curral_and_greedy):
+      for box in virtual_boxes:
+        if(box not in self.goals):
+          if(self._curral_locked(box, virtual_boxes)):
+            return False
     return True
 
   def _move_player(self, direction):
@@ -176,6 +189,27 @@ class Game:
     self._move_player(direction)
 
   def available_events(self):
+    def is_curral(direction, start):
+      if(not Game.curral_and_greedy):
+        return False
+      result = []
+      visited = set()
+      queue = deque()
+      start = (start[0] + direction[0] + direction[0],
+               start[1] + direction[1] + direction[1])
+      queue.append(start)
+      while(len(queue) != 0):
+        item = queue.popleft()
+        if(item in visited):
+          continue
+        if(item == self.player):
+          return False
+        visited.add(item)
+        for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+          pos = (item[0] + direction[0], item[1] + direction[1])
+          if(self.map[pos[0]][pos[1]] != "#" and pos not in self.boxes):
+            queue.append(pos)
+      return True
     result = []
     visited = set()
     queue = deque()
@@ -190,7 +224,7 @@ class Game:
         if(self.map[pos[0]][pos[1]] != "#" and pos not in self.boxes):
           queue.append((pos, item[1] + [char]))
         elif(pos in self.boxes and self.can_move(direction, item[0])):
-          result.append(item[1] + [char])
+          result.append((item[1] + [char], is_curral(direction, item[0])))
     return result
 
   def perform_event(self, event):
@@ -300,41 +334,49 @@ class Game:
       return True
     return False
 
+  def manhattan(self, p1, p2): return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+  def euclidian(self, p1, p2):
+    return (p1[0] - p2[0])**2 + abs(p1[1] - p2[1])**2
+
+  def push_distance(self, p1, p2):
+    # code below not used cause it's slow af
+    to_test = [(p1, 0, self.manhattan(p1, p2))]
+    visited = set()
+    while(to_test != []):
+      popped = to_test.pop()
+      if(popped[0] in visited):
+        continue
+      visited.add(popped[0])
+      if(popped[0] == p2):
+        return popped[1]
+      for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+        new_point = (popped[0][0] + direction[0],
+                     popped[0][1] + direction[1])
+        if(self.map[new_point[0]][new_point[1]] == "#"):
+          continue
+        item = (new_point, popped[1] + 1, self.manhattan(new_point, p2))
+        i = 0
+        while(i < len(to_test) and to_test[i][2] > item[2]):
+          i += 1
+        to_test.insert(i, item)
+
   def cost(self):
     # return len(self.path)
-    def dist(p1, p2):
-      def manhattan(p1, p2): return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
-      def euclidian(p1, p2): return (p1[0] - p2[0])**2 + abs(p1[1] - p2[1])**2
-      return manhattan(p1, p2)
-      # code below not used cause it's slow af
-      to_test = [(p1, 0, manhattan(p1, p2))]
-      visited = set()
-      while(to_test != []):
-        popped = to_test.pop()
-        if(popped[0] in visited):
-          continue
-        visited.add(popped[0])
-        if(popped[0] == p2):
-          return popped[1]
-        for direction in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-          new_point = (popped[0][0] + direction[0],
-                       popped[0][1] + direction[1])
-          if(self.map[new_point[0]][new_point[1]] == "#"):
-            continue
-          item = (new_point, popped[1] + 1, manhattan(new_point, p2))
-          i = 0
-          while(i < len(to_test) and to_test[i][2] > item[2]):
-            i += 1
-          to_test.insert(i, item)
     cost = 0
+    if(Game.curral_and_greedy):
+      for box, goal in zip(self.boxes, self.goals):
+        cost += self.manhattan(box, goal)
+      return cost - self.curral_count * 1
+
     correct = 10
     for box in self.boxes:
       if (box not in self.goals):
         min_cost = float("inf")
         for goal in self.goals:
-          distance = dist(box, goal)
+          distance = self.manhattan(box, goal)
           if(distance < min_cost):
-            min_cost = dist(box, goal)
+            min_cost = self.manhattan(box, goal)
         cost += min_cost ** 2
       else:
         correct <<= 2
@@ -381,6 +423,7 @@ class Game:
     result.boxes = self.boxes[:]
     result.player = tuple(self.player)
     result.goals = self.goals
+    result.curral_count = self.curral_count
     result.deadlocks = self.deadlocks
     result.path = self.path[:]
     return result
@@ -392,13 +435,12 @@ class Game:
     return self != other
 
   def __hash__(self):
-    # return hash("".join("".join(i) for i in self.map))
+    return hash(str(self))
     # return hash(tuple([hash(tuple(l)) for l in self.map]))
-    result = 0
-    for i in self.boxes:
-      result += i[0] + i[1]
-    return result +  hash(self.player)
-
+    # result = 0
+    # for i in self.boxes:
+    #  result += i[0] + i[1]
+    # return result +  hash(self.player)
 
 
 if __name__ == "__main__":

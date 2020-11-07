@@ -24,9 +24,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
       try:
         while solution == None:
           start_time = time()
-          solution = agent.solve(100)
+          solution = agent.solve(10)
           elapsed_time = time() - start_time
-
           for i in range(0, int(elapsed_time * fps + 10)):
             await websocket.recv()
 
@@ -45,7 +44,7 @@ def main():
   loop = asyncio.get_event_loop()
   SERVER = os.environ.get("SERVER", "localhost")
   PORT = os.environ.get("PORT", "8000")
-  NAME = "93357"
+  NAME = "ez 20"
   loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
 
 
