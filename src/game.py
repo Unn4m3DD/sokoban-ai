@@ -145,7 +145,7 @@ class Game:
             queue.append(pos)
     return True
 
-  def can_move(self, direction, source=None):
+  def can_move(self, direction, source=None, simple=False):
     if(source == None):
       source = self.player
     target = (source[0] + direction[0], source[1] + direction[1])
@@ -160,10 +160,10 @@ class Game:
           box_target in self.boxes or
           self.map[box_target[0]][box_target[1]] == "#" or
           box_target in self.deadlocks or
-          self._dynamic_deadlock(box_target, virtual_boxes)
+          not simple and self._dynamic_deadlock(box_target, virtual_boxes)
       ):
         return False
-    if(Game.curral_and_greedy):
+    if(not simple and Game.curral_and_greedy):
       for box in virtual_boxes:
         if(box not in self.goals):
           if(self._curral_locked(box, virtual_boxes)):
@@ -435,12 +435,12 @@ class Game:
     return self != other
 
   def __hash__(self):
-    return hash(str(self))
+    # return hash(str(self))
     # return hash(tuple([hash(tuple(l)) for l in self.map]))
-    # result = 0
-    # for i in self.boxes:
-    #  result += i[0] + i[1]
-    # return result +  hash(self.player)
+    result = 0
+    for i in self.boxes:
+      result += i[0] + i[1]
+    return result +  hash(self.player)
 
 
 if __name__ == "__main__":
