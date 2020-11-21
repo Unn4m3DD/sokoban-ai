@@ -1,7 +1,6 @@
 from time import time
-from new_game import Game
+from src.new_game import Game
 from collections import deque
-from optimizer import optimize
 directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
 

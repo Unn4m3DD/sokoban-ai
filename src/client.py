@@ -4,7 +4,7 @@ import json
 import os
 from time import time
 import websockets
-from agent import Agent
+from src.agent import Agent
 from time import sleep
 
 
