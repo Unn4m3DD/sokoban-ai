@@ -21,6 +21,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
       level = json.loads(await websocket.recv())["level"]
       agent = Agent(open(f"levels/{level}.xsb").read())
       solution = None
+      outer_start_time = time()
       try:
         while solution == None:
           start_time = time()
@@ -34,7 +35,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
               json.dumps({"cmd": "key", "key": key})
           )
           await websocket.recv()
-
+        print(
+            f"solved {level} in {round((time() - outer_start_time) /100) * 100} seconds")
       except websockets.exceptions.ConnectionClosedOK:
         print("Server has cleanly disconnected us")
         return
@@ -44,7 +46,7 @@ def main():
   loop = asyncio.get_event_loop()
   SERVER = os.environ.get("SERVER", "localhost")
   PORT = os.environ.get("PORT", "8000")
-  NAME = "ez 20"
+  NAME = "andre"
   loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
 
 
