@@ -24,9 +24,9 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
       try:
         while solution == None:
           start_time = time()
-          solution = agent.solve(10)
+          solution = agent.solve(1, 300, fps)
           elapsed_time = time() - start_time
-          for i in range(0, int(elapsed_time * fps + 10)):
+          for i in range(0, int(elapsed_time * fps + 1)):
             await websocket.recv()
 
         for key in solution:

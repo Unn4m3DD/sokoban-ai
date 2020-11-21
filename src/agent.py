@@ -14,20 +14,20 @@ class Agent:
     self.to_solve.append((self.original_game, self.original_game.cost()))
     self.best_cost = float("inf")
     self.elapsed_time = 0
-    self.best_game = None
+    self.best_game = Game(original_map)
 
   def solve(self, timeout, global_timeout=300, fps=10):
     initial_time = time()
     elapsed_time = 0
     while(elapsed_time < timeout and self.to_solve != []):
-      if(self.elapsed_time > global_timeout - self.best_game.path * fps - 10):
+      if(self.elapsed_time > global_timeout - len(self.best_game.path) / (fps - 4)):
         return self.best_game.path
       # print(self.visited)
       elapsed_time = time() - initial_time
       popped = self.to_solve.pop()
 
       attempts = self._get_valid_attempts(popped[0])
-      # print(popped[0])
+      #print(popped[0])
       for attempt in attempts:
         if(attempt.won()):
           return attempt.path
@@ -37,6 +37,7 @@ class Agent:
         cost = attempt.cost()
         # must be called after cost
         if attempt.better_than(self.best_game):
+          # print(attempt)
           self.best_game = attempt
         i = 0
         to_solve_size = len(self.to_solve)

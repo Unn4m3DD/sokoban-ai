@@ -3,8 +3,8 @@ from copy import deepcopy
 
 class Game:
   directions = [
-      (1, 0),
       (-1, 0),
+      (1, 0),
       (0, 1),
       (0, -1),
   ]
@@ -16,6 +16,7 @@ class Game:
   }
 
   def __init__(self, map_string=None):
+    self.box_on_goal = 0
     if(map_string == None):
       return
     self.map = []
@@ -24,7 +25,6 @@ class Game:
     self.deadlocks = set()
     self.player = ()
     self.path = []
-    self.box_on_goal = 0
     horizontal_size = 0
     for y, line in enumerate(map_string.split("\n")[:-1]):
       self.map.append([])
@@ -161,13 +161,14 @@ class Game:
       if (box not in self.goals):
         min_cost = float("inf")
         for goal in self.goals:
+          if(goal[1] == box[1]):
+            cost -= 100
           distance = dist(box, goal)
-          if(distance == 0):
-            self.box_on_goal += 1
           if(distance < min_cost):
             min_cost = distance
         cost += min_cost ** 2
       else:
+        self.box_on_goal += 1
         correct <<= 2
     return cost - correct
 
@@ -201,9 +202,9 @@ class Game:
     return result
 
   def better_than(self, other):
-    if(self.box_on_goal > other.box_on_goal ):
+    if(self.box_on_goal > other.box_on_goal):
       return True
-    if(self.box_on_goal < other.box_on_goal ):
+    if(self.box_on_goal < other.box_on_goal):
       return False
     return self.path < other.path
 
