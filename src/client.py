@@ -2,61 +2,76 @@ import asyncio
 import getpass
 import json
 import os
+import random
+from src.agent import Agent
 from time import time
 import websockets
-from src.agent import Agent
-from time import sleep
-import threading
 
 
-def set_interval(func, sec):
-  def func_wrapper():
-    set_interval(func, sec)
-    func()
-  t = threading.Timer(sec, func_wrapper)
-  t.start()
-  return t
-
-
-async def agent_loop(server_address="localhost:8000", agent_name="student"):
-  async with websockets.connect(f"ws://{server_address}/player", close_timeout=10000) as websocket:
-    await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
-    server_request = json.loads(await websocket.recv())
-    print(server_request)
-    fps = int(server_request["fps"])
-    level = server_request["map"]
+async def solver(puzzle, solution):
+  global fps
+  while True:
+    game_properties = await puzzle.get()
+    level = game_properties["map"]
+    start_time = time()
     agent = Agent(open(level).read())
+    # inside there is a await asyncio.sleep(0)
+    keys = await agent.solve(300, game_properties["fps"])
+    print(
+        f"level {level} solved in {round((time() - start_time + len(keys) / game_properties['fps']) * 100) / 100} seconds")
+
+    await solution.put(keys)
+
+
+async def agent_loop(puzzle, solution, server_address="localhost:8000", agent_name="student"):
+  global fps
+  async with websockets.connect(f"ws://{server_address}/player") as websocket:
+
+    # Receive information about static game properties
+    await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
+
     while True:
-      level = json.loads(await websocket.recv())["level"]
-      agent = Agent(open(f"levels/{level}.xsb").read())
-      solution = None
-      outer_start_time = time()
       try:
-        thread = set_interval(websocket.recv, 1 / (fps + 1))
-        while solution == None:
-          start_time = time()
-          solution = agent.solve(1, 300, fps)
-          elapsed_time = time() - start_time
-        thread.cancel()
-        for key in solution:
-          await websocket.send(
-              json.dumps({"cmd": "key", "key": key})
-          )
-          await websocket.recv()
-        print(
-            f"solved {level} in {round((time() - outer_start_time) * 100) / 100} seconds")
+        update = json.loads(
+            await websocket.recv()
+        )  # receive game update, this must be called timely or your game will get out of sync with the server
+
+        if "map" in update:
+          # we got a new level
+          game_properties = update
+          keys = ""
+          await puzzle.put(game_properties)
+
+        if not solution.empty():
+          keys = await solution.get()
+
+        key = ""
+        if len(keys):  # we got a solution!
+          key = keys[0]
+          keys = keys[1:]
+
+        await websocket.send(
+            json.dumps({"cmd": "key", "key": key})
+        )
+
       except websockets.exceptions.ConnectionClosedOK:
         print("Server has cleanly disconnected us")
         return
 
+# DO NOT CHANGE THE LINES BELLOW
+# You can change the default values using the command line, example:
+# $ NAME='arrumador' python3 client.py
+loop = asyncio.get_event_loop()
+SERVER = os.environ.get("SERVER", "localhost")
+PORT = os.environ.get("PORT", "8000")
+NAME = os.environ.get("NAME", getpass.getuser())
 
-def main():
-  loop = asyncio.get_event_loop()
-  SERVER = os.environ.get("SERVER", "localhost")
-  PORT = os.environ.get("PORT", "8000")
-  NAME = "andre"
-  loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
+puzzle = asyncio.Queue(loop=loop)
+solution = asyncio.Queue(loop=loop)
 
+net_task = loop.create_task(agent_loop(
+    puzzle, solution, f"{SERVER}:{PORT}", NAME))
+solver_task = loop.create_task(solver(puzzle, solution))
 
-if __name__ == "__main__":
-  main()
+loop.run_until_complete(asyncio.gather(net_task, solver_task))
+loop.close()

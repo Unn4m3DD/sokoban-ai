@@ -1,3 +1,4 @@
+import asyncio
 from time import time
 from src.new_game import Game
 from collections import deque
@@ -12,17 +13,16 @@ class Agent:
     self.to_solve = deque()
     self.to_solve.append((self.original_game, self.original_game.cost()))
     self.best_cost = float("inf")
-    self.elapsed_time = 0
     self.best_game = Game(original_map)
 
-  def solve(self, timeout, global_timeout=300, fps=10):
+  async def solve(self, global_timeout=300, fps=10):
     initial_time = time()
     elapsed_time = 0
-    while(elapsed_time < timeout and self.to_solve != []):
-      if(self.elapsed_time > global_timeout - len(self.best_game.path) / (fps - 4)):
+    while(self.to_solve != []):
+      elapsed_time = time() - initial_time
+      if(elapsed_time > global_timeout - len(self.best_game.path) / (fps - 4)):
         return self.best_game.path
       # print(self.visited)
-      elapsed_time = time() - initial_time
       popped = self.to_solve.pop()
 
       attempts = self._get_valid_attempts(popped[0])
@@ -52,7 +52,7 @@ class Agent:
 
           # print(self.to_solve[-1][1])
           # print()
-    self.elapsed_time += elapsed_time
+      await asyncio.sleep(0)
     return None
 
   def _get_valid_attempts(self, game):
