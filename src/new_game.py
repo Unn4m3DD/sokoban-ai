@@ -24,6 +24,7 @@ class Game:
     self.deadlocks = set()
     self.player = ()
     self.path = []
+    self.box_on_goal = 0
     horizontal_size = 0
     for y, line in enumerate(map_string.split("\n")[:-1]):
       self.map.append([])
@@ -152,16 +153,23 @@ class Game:
       self.move(direction)
 
   def cost(self):
+    # return len(self.path)
     def dist(a, b): return abs(a[0] - b[0]) + abs(a[1] - b[1])
+    correct = 10
     cost = 0
-    for goal in self.goals:
-      inner_cost = []
-      for box in self.boxes:
-        inner_cost.append(dist(goal, box))
-      cost += sum(inner_cost)
-      if(box == goal):
-        cost -= 10
-    return cost
+    for box in self.boxes:
+      if (box not in self.goals):
+        min_cost = float("inf")
+        for goal in self.goals:
+          distance = dist(box, goal)
+          if(distance == 0):
+            self.box_on_goal += 1
+          if(distance < min_cost):
+            min_cost = distance
+        cost += min_cost ** 2
+      else:
+        correct <<= 2
+    return cost - correct
 
   def won(self):
     for goal in self.goals:
@@ -192,19 +200,28 @@ class Game:
       result += "".join(line) + "\n"
     return result
 
-  def __eq__(self, other):
-    if other is None:
+  def better_than(self, other):
+    if(self.box_on_goal > other.box_on_goal ):
+      return True
+    if(self.box_on_goal < other.box_on_goal ):
       return False
+    return self.path < other.path
+
+  def __ne__(self, other):
+    return not (self == other)
+
+  def __eq__(self, other):
     for box in self.boxes:
       if(box not in other.boxes):
         return False
-    if(self.player != other.player):
-      return False
-    return True
+
+    return self.player == other.player
 
   def __hash__(self):
-    box_sorted = sorted(self.boxes, key=lambda e: e[0] + e[1])
-    return hash(tuple(box_sorted)) + hash(self.player)
+    result = 0
+    for i in self.boxes:
+      result += i[0] + i[1]
+    return result + hash(self.player)
 
   def clone(self):
     result = Game()
@@ -242,7 +259,7 @@ if __name__ == "__main__":
 -#--###
 -####
 """)
-  #dirs = [(-1, 0), (-1, 0), (0, 1), (-1, 0),  (-1, 0)]
+  # dirs = [(-1, 0), (-1, 0), (0, 1), (-1, 0),  (-1, 0)]
   # for d in dirs:
   #  if(game.can_move(d)):
   #    game.move(d)

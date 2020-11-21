@@ -429,7 +429,10 @@ class Game:
     return result
 
   def __eq__(self, other):
-    return self.player == other.player and self.boxes == other.boxes
+    for box in self.boxes:
+      if box not in other.boxes:
+        return False
+    return self.player == other.player 
 
   def __ne__(self, other):
     return self != other

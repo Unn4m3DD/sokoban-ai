@@ -9,5 +9,5 @@
     "**/__pycache__/": true,
     "student.py": true
   },
-  "python.pythonPath": "venv/bin/python"
+  "python.pythonPath": "/home/andre/tmp/trabalho-de-grupo-sokoban-p3_93357_88194/venv/bin/python3"
 }
