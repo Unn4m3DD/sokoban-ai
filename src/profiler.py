@@ -1,7 +1,7 @@
 import sys
 import os
 from time import time
-from src.agent import Agent
+from agent import Agent
 import re
 import json
 import asyncio

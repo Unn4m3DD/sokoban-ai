@@ -3,7 +3,7 @@ import getpass
 import json
 import os
 import random
-from src.agent import Agent
+from agent import Agent
 from time import time
 import websockets
 

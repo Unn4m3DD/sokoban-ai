@@ -1,6 +1,6 @@
 import asyncio
 from time import time
-from src.game import Game
+from game import Game
 from collections import deque
 directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
